@@ -1,7 +1,7 @@
 package com.analyticalsolution.analyticalsolution.controller;
 
-import com.analyticalsolution.analyticalsolution.entity.Customer;
-import com.analyticalsolution.analyticalsolution.service.CustomerService;
+import com.analyticalsolution.analyticalsolution.entity.User;
+import com.analyticalsolution.analyticalsolution.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,23 +14,24 @@ import org.springframework.web.bind.annotation.*;
 public class PublicController {
 
     @Autowired
-    private CustomerService customerService;
+    private UserService userService;
 
-    //  Check whether the server is running
+    // Check whether the server is running
     @GetMapping("/")
     public String serverCheck(){
         return "Server is running...";
     }
 
-    //  Create new customer
-    @PostMapping("/createCustomer")
-    public ResponseEntity<?> createCustomer(@RequestBody Customer customer){
+    // Create new admin
+    @PostMapping("/createUser")
+    public ResponseEntity<?> createUser(@RequestBody User user){
         try{
-            int newCustomer = customerService.createCustomer(customer);
+            int newAdmin = userService.createUser(user);
             return new ResponseEntity<>(HttpStatus.CREATED);
         }catch (Exception e){
-            log.error("Error creating customer user: " + e);
+            log.error("Error creating admin user: " + e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
 }
