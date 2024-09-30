@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+
 @Slf4j
 @Service
 public class UserService {
@@ -51,6 +53,16 @@ public class UserService {
         } catch (Exception e) {
             log.error("Error creating user: " + e.getMessage());
             return -1;
+        }
+    }
+
+    // Fetch user profile image
+    public File getUserProfile(String username){
+        try{
+            return utilityService.fetchProfileImage(username);
+        } catch (Exception e) {
+            log.error("Error fetching image: " + e);
+            return null;
         }
     }
 

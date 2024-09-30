@@ -43,6 +43,7 @@ public class PublicController {
         }
     }
 
+    // Temporary method to fetch user
     @GetMapping("/getUserByUsername/{username}")
     public User getUser(@PathVariable String username){
         return userRepository.findUserByUsername(username);
