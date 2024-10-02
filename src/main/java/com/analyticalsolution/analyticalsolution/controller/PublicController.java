@@ -27,7 +27,7 @@ public class PublicController {
         return "Server is running...";
     }
 
-    // Create new admin
+    // Create new user
     @PostMapping("/createUser")
     public ResponseEntity<?> createUser(@ModelAttribute User user, @RequestParam("profileImage") MultipartFile profileImage) {
         try {
@@ -36,12 +36,18 @@ public class PublicController {
             }
 
             int result = userService.createUser(user, profileImage);
+            if (result == -1) {
+                // User creation failed (either due to existing user or system error)
+                return new ResponseEntity<>("User creation failed: User already exists or invalid data.", HttpStatus.BAD_REQUEST);
+            }
+
             return new ResponseEntity<>("User created successfully", HttpStatus.CREATED);
         } catch (Exception e) {
-            log.error("Error creating user: ", e);
-            return new ResponseEntity<>("Error creating user", HttpStatus.BAD_REQUEST);
+            log.error("Unexpected error creating user: ", e);
+            return new ResponseEntity<>("Unexpected error creating user", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     // Temporary method to fetch user
     @GetMapping("/getUserByUsername/{username}")

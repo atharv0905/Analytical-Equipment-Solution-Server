@@ -26,7 +26,7 @@ public class UserController {
 
     // Get user profile by usernam
     @GetMapping("/getUserProfile/{username}")
-    public ResponseEntity<FileSystemResource> getUserProfile(@PathVariable String username) {
+    public ResponseEntity<?> getUserProfile(@PathVariable String username) {
         try {
             File userProfile = userService.getUserProfile(username);
             if (userProfile != null && userProfile.exists()) {
@@ -46,11 +46,14 @@ public class UserController {
                         .contentType(MediaType.parseMediaType(contentType))
                         .body(fileResource);
             } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND); // User profile not found
+                // If the profile image is not found, return 404
+                return new ResponseEntity<>("Profile image for user " + username + " not found.", HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
-            log.error("Error fetching profile: " + e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            log.error("Error fetching profile for user " + username + ": " + e.getMessage());
+            // Return a 400 Bad Request status if an error occurs
+            return new ResponseEntity<>("Error fetching profile for user " + username + ": " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
 }

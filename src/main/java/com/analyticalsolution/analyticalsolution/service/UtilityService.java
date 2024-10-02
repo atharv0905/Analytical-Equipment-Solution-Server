@@ -36,10 +36,9 @@ public class UtilityService {
             // Save the image file
             File imageFile = new File(UPLOAD_DIR + fileName);
             file.transferTo(imageFile);
-            System.out.println("File transferred successfully");
 
             // Return the relative path for storage in the database
-            return "profiles/" + fileName;
+            return fileName;
         } catch (IOException e) {
             System.err.println("Error saving file: " + e.getMessage());
             return null; // Return null if there was an error
@@ -51,16 +50,13 @@ public class UtilityService {
         // Find user by username
         User user = userRepository.findUserByUsername(username);
         if (user == null) {
-            System.out.println("User not found");
             return null; // Return null if user not found
         }
 
         String profilePath = user.getProfile_path();
-        System.out.println("Profile path: "+ UPLOAD_DIR+profilePath);
         File profileImageFile = new File(UPLOAD_DIR + profilePath);
 
         if (!profileImageFile.exists()) {
-            System.out.println("Profile image does not exist");
             return null; // Return null if the file does not exist
         }
 
