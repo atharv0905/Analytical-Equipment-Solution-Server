@@ -52,4 +52,38 @@ public class UserRepository {
             return null;
         }
     }
+
+    // Find user by ID
+    public User findUserById(String userId) {
+        try {
+            String sql = "SELECT * FROM users WHERE id = ?";
+
+            return jdbcTemplate.queryForObject(sql, new Object[]{userId}, (rs, rowNum) -> {
+                User user = new User();
+                user.setId(rs.getString("id"));
+                user.setUsername(rs.getString("username"));
+                user.setName(rs.getString("name"));
+                user.setPassword(rs.getString("password"));
+                user.setEmail(rs.getString("email"));
+                user.setPhone(rs.getLong("phone"));
+
+                String addressJson = rs.getString("address");
+                String rolesJson = rs.getString("roles");
+                try {
+                    user.setAddresses(objectMapper.readValue(addressJson, new TypeReference<ArrayList<String>>() {}));
+                    user.setRoles(objectMapper.readValue(rolesJson, new TypeReference<ArrayList<String>>() {}));
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+
+                user.setProfile_path(rs.getString("profile_path"));
+                return user;
+            });
+
+        } catch (Exception e) {
+            log.error("Error finding user by ID: " + e.getMessage());
+            return null;
+        }
+    }
+
 }

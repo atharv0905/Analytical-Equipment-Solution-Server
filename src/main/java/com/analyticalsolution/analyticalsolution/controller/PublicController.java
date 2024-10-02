@@ -49,9 +49,15 @@ public class PublicController {
     }
 
 
-    // Temporary method to fetch user
+    // Temporary method to fetch user by username
     @GetMapping("/getUserByUsername/{username}")
-    public User getUser(@PathVariable String username){
+    public User getUserByUsername(@PathVariable String username){
         return userRepository.findUserByUsername(username);
+    }
+
+    // Temporary method to fetch user by user id
+    @GetMapping("/getUserByUID/{uid}")
+    public User getUserByUID(@PathVariable String uid){
+        return userRepository.findUserById(uid);
     }
 }

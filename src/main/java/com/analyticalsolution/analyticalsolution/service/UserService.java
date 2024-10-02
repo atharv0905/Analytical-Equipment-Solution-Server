@@ -68,6 +68,52 @@ public class UserService {
         }
     }
 
+    // Update existing user
+    public int updateUser(User user, MultipartFile profileImage) {
+        try {
+            // Check if the user exists
+            User existingUser = userRepository.findUserById(user.getId());
+            if (existingUser == null) {
+                log.error("User with ID " + user.getId() + " not found.");
+                return -1;
+            }
+
+            String sql = "UPDATE users SET username = ?, name = ?, password = ?, email = ?, phone = ?, address = ?, roles = ?, profile_path = ? WHERE id = ?";
+
+            // Convert roles and addresses to JSON
+            String rolesJson = objectMapper.writeValueAsString(user.getRoles());
+            String addressJson = objectMapper.writeValueAsString(user.getAddresses());
+
+            // If password is being updated, encode the new password
+            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            } else {
+                user.setPassword(existingUser.getPassword());  // Keep existing password if not updated
+            }
+
+            // If a new profile image is provided, save it and update the path
+            String profileImagePath = existingUser.getProfile_path();  // Default to the existing image path
+            if (profileImage != null && !profileImage.isEmpty()) {
+                profileImagePath = utilityService.saveProfileImage(profileImage, user.getUsername());
+            }
+
+            return jdbcTemplate.update(sql,
+                    user.getUsername(),
+                    user.getName(),
+                    user.getPassword(),
+                    user.getEmail(),
+                    user.getPhone(),
+                    addressJson,
+                    rolesJson,
+                    profileImagePath,
+                    user.getId());  // Where condition
+        } catch (Exception e) {
+            log.error("Unexpected error updating user: " + e.getMessage());
+            return -1;
+        }
+    }
+
+
     // Fetch user profile image
     public File getUserProfile(String username) {
         try {
