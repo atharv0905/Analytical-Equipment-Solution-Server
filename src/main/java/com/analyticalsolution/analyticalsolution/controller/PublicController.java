@@ -1,12 +1,18 @@
 package com.analyticalsolution.analyticalsolution.controller;
 
+import com.analyticalsolution.analyticalsolution.entity.LoginRequest;
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
+import com.analyticalsolution.analyticalsolution.service.UserDetailsServiceImpl;
 import com.analyticalsolution.analyticalsolution.service.UserService;
+import com.analyticalsolution.analyticalsolution.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +27,15 @@ public class PublicController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
     // Check whether the server is running
     @GetMapping("/")
     public String serverCheck(){
@@ -28,8 +43,8 @@ public class PublicController {
     }
 
     // Create new user
-    @PostMapping("/createUser")
-    public ResponseEntity<?> createUser(@ModelAttribute User user, @RequestParam("profileImage") MultipartFile profileImage) {
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@ModelAttribute User user, @RequestParam("profileImage") MultipartFile profileImage) {
         try {
             if (profileImage == null || profileImage.isEmpty()) {
                 return new ResponseEntity<>("Profile image is required", HttpStatus.BAD_REQUEST);
@@ -48,6 +63,18 @@ public class PublicController {
         }
     }
 
+    // Login user
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+            UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
+            String jwtToken = jwtUtils.generateToken(userDetails.getUsername());
+            return new ResponseEntity<>(jwtToken, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 
     // Temporary method to fetch user by username
     @GetMapping("/getUserByUsername/{username}")

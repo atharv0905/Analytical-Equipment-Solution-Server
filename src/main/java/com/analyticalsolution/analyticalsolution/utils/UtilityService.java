@@ -1,4 +1,4 @@
-package com.analyticalsolution.analyticalsolution.service;
+package com.analyticalsolution.analyticalsolution.utils;
 
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
