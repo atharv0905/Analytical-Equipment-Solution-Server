@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -73,9 +75,10 @@ public class UserService {
     public int updateUser(User user, MultipartFile profileImage) {
         try {
             // Check if the user exists
-            User existingUser = userRepository.findUserById(user.getId());
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User existingUser = userRepository.findUserByUsername(authentication.getName().toString());
             if (existingUser == null) {
-                log.error("User with ID " + user.getId() + " not found.");
+                log.error("User not found.");
                 return -1;
             }
 
@@ -97,7 +100,6 @@ public class UserService {
             if (profileImage != null && !profileImage.isEmpty()) {
                 profileImagePath = utilityService.saveProfileImage(profileImage, user.getUsername());
             }
-
             return jdbcTemplate.update(sql,
                     user.getUsername(),
                     user.getName(),
@@ -107,7 +109,7 @@ public class UserService {
                     addressJson,
                     rolesJson,
                     profileImagePath,
-                    user.getId());  // Where condition
+                    existingUser.getId());  // Where condition
         } catch (Exception e) {
             log.error("Unexpected error updating user: " + e.getMessage());
             return -1;
