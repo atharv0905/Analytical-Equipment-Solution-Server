@@ -37,6 +37,4 @@ public class User {
     @NonNull
     private ArrayList<String> roles = new ArrayList<>();
 
-    @NonNull
-    private String profile_path;
 }

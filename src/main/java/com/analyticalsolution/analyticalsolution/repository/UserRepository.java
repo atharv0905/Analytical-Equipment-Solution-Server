@@ -43,7 +43,6 @@ public class UserRepository {
                     throw new RuntimeException(e);
                 }
 
-                user.setProfile_path(rs.getString("profile_path"));
                 return user;
             });
 
@@ -76,7 +75,6 @@ public class UserRepository {
                     throw new RuntimeException(e);
                 }
 
-                user.setProfile_path(rs.getString("profile_path"));
                 return user;
             });
 

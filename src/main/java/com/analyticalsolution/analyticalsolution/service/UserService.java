@@ -35,7 +35,7 @@ public class UserService {
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // Create new user
-    public int createUser(User user, MultipartFile profileImage) {
+    public int createUser(User user) {
         try {
             User existingUser = userRepository.findUserByUsername(user.getUsername());
             if (existingUser != null) {
@@ -43,17 +43,14 @@ public class UserService {
                 return -1;
             }
 
-            String sql = "INSERT INTO users (id, username, name, password, email, phone, address, roles, profile_path) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO users (id, username, name, password, email, phone, address, roles) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             String rolesJson = objectMapper.writeValueAsString(user.getRoles());
             String addressJson = objectMapper.writeValueAsString(user.getAddresses());
 
             user.setId(UUID.randomUUID().toString());
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-            // Save profile image and get the path
-            String profileImagePath = utilityService.saveProfileImage(profileImage, user.getUsername());
 
             return jdbcTemplate.update(sql,
                     user.getId(),
@@ -63,8 +60,7 @@ public class UserService {
                     user.getEmail(),
                     user.getPhone(),
                     addressJson,
-                    rolesJson,
-                    profileImagePath);
+                    rolesJson);
         } catch (Exception e) {
             log.error("Unexpected error creating user: " + e.getMessage());
             return -1;
@@ -72,7 +68,7 @@ public class UserService {
     }
 
     // Update existing user
-    public int updateUser(User user, MultipartFile profileImage) {
+    public int updateUser(User user) {
         try {
             // Check if the user exists
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -82,7 +78,7 @@ public class UserService {
                 return -1;
             }
 
-            String sql = "UPDATE users SET username = ?, name = ?, password = ?, email = ?, phone = ?, address = ?, roles = ?, profile_path = ? WHERE id = ?";
+            String sql = "UPDATE users SET username = ?, name = ?, password = ?, email = ?, phone = ?, address = ?, roles = ? WHERE id = ?";
 
             // Convert roles and addresses to JSON
             String rolesJson = objectMapper.writeValueAsString(user.getRoles());
@@ -95,11 +91,6 @@ public class UserService {
                 user.setPassword(existingUser.getPassword());  // Keep existing password if not updated
             }
 
-            // If a new profile image is provided, save it and update the path
-            String profileImagePath = existingUser.getProfile_path();  // Default to the existing image path
-            if (profileImage != null && !profileImage.isEmpty()) {
-                profileImagePath = utilityService.saveProfileImage(profileImage, user.getUsername());
-            }
             return jdbcTemplate.update(sql,
                     user.getUsername(),
                     user.getName(),
@@ -108,29 +99,11 @@ public class UserService {
                     user.getPhone(),
                     addressJson,
                     rolesJson,
-                    profileImagePath,
                     existingUser.getId());  // Where condition
         } catch (Exception e) {
             log.error("Unexpected error updating user: " + e.getMessage());
             return -1;
         }
     }
-
-
-    // Fetch user profile image
-    public File getUserProfile(String username) {
-        try {
-            File profileImage = utilityService.fetchProfileImage(username);
-            if (profileImage == null || !profileImage.exists()) {
-                log.error("Profile image for user " + username + " not found.");
-                return null;  // Return null if the profile image doesn't exist
-            }
-            return profileImage;
-        } catch (Exception e) {
-            log.error("Error fetching profile image for user " + username + ": " + e.getMessage());
-            return null;  // Return null on error
-        }
-    }
-
 
 }

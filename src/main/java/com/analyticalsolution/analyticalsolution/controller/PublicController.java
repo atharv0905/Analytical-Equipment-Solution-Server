@@ -14,7 +14,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -44,13 +43,9 @@ public class PublicController {
 
     // Create new user
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@ModelAttribute User user, @RequestParam("profileImage") MultipartFile profileImage) {
+    public ResponseEntity<?> signup(@RequestBody User user) {
         try {
-            if (profileImage == null || profileImage.isEmpty()) {
-                return new ResponseEntity<>("Profile image is required", HttpStatus.BAD_REQUEST);
-            }
-
-            int result = userService.createUser(user, profileImage);
+            int result = userService.createUser(user);
             if (result == -1) {
                 // User creation failed (either due to existing user or system error)
                 return new ResponseEntity<>("User creation failed: User already exists or invalid data.", HttpStatus.BAD_REQUEST);

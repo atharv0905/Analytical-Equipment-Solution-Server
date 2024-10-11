@@ -27,7 +27,7 @@ public class AnalyticalsolutionApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
-						.allowedOrigins("http://127.0.0.1:5500/") // Replace with the frontend URL if different
+						.allowedOrigins("http://127.0.0.1:5501/") // Replace with the frontend URL if different
 						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 						.allowedHeaders("*")
 						.allowCredentials(true);
