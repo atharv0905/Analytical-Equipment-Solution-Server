@@ -1,8 +1,20 @@
+/**
+ * File: PublicController.java
+ * Author: Atharv Mirgal
+ * Description: This controller handles public API endpoints for user authentication and registration.
+ *              It includes methods for user signup, login, token verification, and server status check.
+ *              Additionally, it offers temporary endpoints for fetching user details by username or user ID.
+ *              Utilizes JWT for secure authentication and logs errors for troubleshooting.
+ * Created on: 11/10/2024
+ * Last Modified: 11/10/2024
+ */
+
 package com.analyticalsolution.analyticalsolution.controller;
 
-import com.analyticalsolution.analyticalsolution.entity.LoginRequest;
+import com.analyticalsolution.analyticalsolution.requests.LoginRequest;
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
+import com.analyticalsolution.analyticalsolution.responses.TokenAuthResponse;
 import com.analyticalsolution.analyticalsolution.service.UserDetailsServiceImpl;
 import com.analyticalsolution.analyticalsolution.service.UserService;
 import com.analyticalsolution.analyticalsolution.utils.JwtUtils;
@@ -66,6 +78,20 @@ public class PublicController {
             UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
             String jwtToken = jwtUtils.generateToken(userDetails.getUsername());
             return new ResponseEntity<>(jwtToken, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Verify user token
+    @GetMapping("/authenticate")
+    public ResponseEntity<TokenAuthResponse> verifyToken(){
+        try{
+            TokenAuthResponse tokenAuthResponse = userService.verifyToken();
+
+            // Adjust response status based on authentication result
+            HttpStatus status = tokenAuthResponse.isStatus() ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
+            return new ResponseEntity<>(tokenAuthResponse, status);
         }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

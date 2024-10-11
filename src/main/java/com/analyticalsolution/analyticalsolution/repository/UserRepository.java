@@ -1,3 +1,14 @@
+/**
+ * File: UserRepository.java
+ * Author: Atharv Mirgal
+ * Description: Repository for handling database interactions for User entities using JdbcTemplate.
+ *              This class provides methods to retrieve user details based on username or user ID,
+ *              mapping the database results to User objects, including parsing JSON fields for
+ *              addresses and roles.
+ * Created on: 11/10/2024
+ * Last Modified: 11/10/2024
+ */
+
 package com.analyticalsolution.analyticalsolution.repository;
 
 import com.analyticalsolution.analyticalsolution.entity.User;

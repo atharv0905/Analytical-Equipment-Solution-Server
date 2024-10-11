@@ -1,3 +1,13 @@
+/**
+ * File: DatabaseConfig.java
+ * Author: Atharv Mirgal
+ * Description: This configuration file sets up the MySQL database connection for the application.
+ *              It provides a DataSource bean for managing database connections and a JdbcTemplate
+ *              bean for executing SQL queries.
+ * Created on: 11/10/2024
+ * Last Modified: 11/10/2024
+ */
+
 package com.analyticalsolution.analyticalsolution.config;
 
 import org.springframework.context.annotation.Bean;

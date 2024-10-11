@@ -1,3 +1,13 @@
+/**
+ * File: UserController.java
+ * Author: Atharv Mirgal
+ * Description: This controller manages user-related operations such as updating user details.
+ *              It provides an endpoint to update user information, and handles different response statuses
+ *              based on the success or failure of the update operation. Logs errors for debugging purposes.
+ * Created on: 11/10/2024
+ * Last Modified: 11/10/2024
+ */
+
 package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.entity.User;
@@ -7,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController

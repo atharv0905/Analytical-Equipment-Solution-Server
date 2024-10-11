@@ -1,3 +1,15 @@
+/**
+ * File: AnalyticalsolutionApplication.java
+ * Author: Atharv Mirgal
+ * Description: The main entry point for the Analytical Solution Spring Boot application.
+ *              It enables transaction management, configures CORS settings for cross-origin requests,
+ *              and provides beans for RestTemplate and WebMvcConfigurer to support HTTP requests
+ *              and CORS policies.
+ * Created on: 11/10/2024
+ * Last Modified: 11/10/2024
+ */
+
+
 package com.analyticalsolution.analyticalsolution;
 
 import org.springframework.boot.SpringApplication;

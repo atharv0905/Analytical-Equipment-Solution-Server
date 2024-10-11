@@ -1,3 +1,12 @@
+/**
+ * File: UserDetailsServiceImpl.java
+ * Author: Atharv Mirgal
+ * Description: Implementation of UserDetailsService for loading user-specific data.
+ *              Retrieves user details from the UserRepository for authentication.
+ * Created on: 11/10/2024
+ * Last Modified: 11/10/2024
+ */
+
 package com.analyticalsolution.analyticalsolution.service;
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;

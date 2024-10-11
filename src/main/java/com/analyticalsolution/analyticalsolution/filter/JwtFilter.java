@@ -1,3 +1,14 @@
+/**
+ * File: JwtFilter.java
+ * Author: Atharv Mirgal
+ * Description: This filter intercepts incoming HTTP requests to validate JWT tokens for authentication.
+ *              It extracts the JWT token from the "Authorization" header, verifies its validity, and sets
+ *              the authentication context for authorized users. If the token is invalid or expired,
+ *              it responds with an HTTP 401 status. The filter is executed once per request.
+ * Created on: 11/10/2024
+ * Last Modified: 11/10/2024
+ */
+
 package com.analyticalsolution.analyticalsolution.filter;
 
 import com.analyticalsolution.analyticalsolution.utils.JwtUtils;
@@ -40,6 +51,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(auth);
+            }else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid or expired JWT token.");
+                return; // Exit the filter chain
             }
         }
         filterChain.doFilter(request, response);

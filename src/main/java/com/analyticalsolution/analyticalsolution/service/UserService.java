@@ -1,7 +1,16 @@
+/**
+ * File: UserService.java
+ * Author: Atharv Mirgal
+ * Description: Service layer for managing user-related operations including user creation, updating, and token verification.
+ * Created on: 11/10/2024
+ * Last Modified: 11/10/2024
+ */
+
 package com.analyticalsolution.analyticalsolution.service;
 
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
+import com.analyticalsolution.analyticalsolution.responses.TokenAuthResponse;
 import com.analyticalsolution.analyticalsolution.utils.UtilityService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -12,9 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 import java.util.UUID;
 
 @Slf4j
@@ -103,6 +109,21 @@ public class UserService {
         } catch (Exception e) {
             log.error("Unexpected error updating user: " + e.getMessage());
             return -1;
+        }
+    }
+
+    // Verify user token
+    public TokenAuthResponse verifyToken() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User existingUser = userRepository.findUserByUsername(authentication.getName());
+            if (existingUser != null) {
+                return new TokenAuthResponse(existingUser, true);
+            } else {
+                return new TokenAuthResponse(false);
+            }
+        } catch (Exception ex) {
+            return new TokenAuthResponse(false);
         }
     }
 

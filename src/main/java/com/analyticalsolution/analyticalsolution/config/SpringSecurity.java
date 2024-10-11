@@ -1,3 +1,16 @@
+/**
+ * File: SpringSecurity.java
+ * Author: Atharv Mirgal
+ * Description: This configuration file sets up Spring Security for the application, enabling
+ *              JWT-based authentication and specifying security policies. It configures
+ *              authentication for "/user/**" endpoints, disables CSRF for stateless sessions,
+ *              and integrates a JWT filter to validate tokens for secure requests.
+ *              It also provides beans for PasswordEncoder using BCrypt and AuthenticationManager
+ *              for managing authentication processes.
+ * Created on: 11/10/2024
+ * Last Modified: 11/10/2024
+ */
+
 package com.analyticalsolution.analyticalsolution.config;
 
 import com.analyticalsolution.analyticalsolution.filter.JwtFilter;
