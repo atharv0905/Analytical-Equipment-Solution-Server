@@ -44,12 +44,7 @@ public class Product {
     @NonNull
     private Long product_price;
 
-//    private ArrayList<String> product_images = new ArrayList<>();
-//
-//    @NonNull
-//    private ArrayList<String> roles = new ArrayList<>();
-
     @NonNull
-    private String product_images;
+    private ArrayList<String> product_images = new ArrayList<>();
 
 }

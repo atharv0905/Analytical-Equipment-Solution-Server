@@ -19,9 +19,9 @@ public class ProductController {
 
     // Add new product
     @PostMapping("/add")
-    public ResponseEntity<?> addProduct(@ModelAttribute Product product, @RequestParam("productImages") MultipartFile productImages){
+    public ResponseEntity<?> addProduct(@ModelAttribute Product product, @RequestParam("productImages") MultipartFile[] productImages){
         try {
-            if (productImages == null || productImages.isEmpty()) {
+            if (productImages == null || productImages.length == 0) {
                 return new ResponseEntity<>("Product images are required", HttpStatus.BAD_REQUEST);
             }
 
