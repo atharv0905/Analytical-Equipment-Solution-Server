@@ -11,10 +11,12 @@
 
 package com.analyticalsolution.analyticalsolution.controller;
 
+import com.analyticalsolution.analyticalsolution.entity.Product;
 import com.analyticalsolution.analyticalsolution.requests.LoginRequest;
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
 import com.analyticalsolution.analyticalsolution.responses.TokenAuthResponse;
+import com.analyticalsolution.analyticalsolution.service.ProductService;
 import com.analyticalsolution.analyticalsolution.service.UserDetailsServiceImpl;
 import com.analyticalsolution.analyticalsolution.service.UserService;
 import com.analyticalsolution.analyticalsolution.utils.JwtUtils;
@@ -26,6 +28,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -46,6 +50,9 @@ public class PublicController {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private ProductService productService;
 
     // Check whether the server is running
     @GetMapping("/")
@@ -94,6 +101,17 @@ public class PublicController {
             return new ResponseEntity<>(tokenAuthResponse, status);
         }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Fetch all products
+    @GetMapping("/allProducts")
+    public ResponseEntity<?> getAllProducts(){
+        try{
+            List<Product> products = productService.fetchAllProducts();
+            return new ResponseEntity<>(products, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Unexpected error while fetching products", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

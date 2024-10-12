@@ -1,6 +1,7 @@
 package com.analyticalsolution.analyticalsolution.service;
 
 import com.analyticalsolution.analyticalsolution.entity.Product;
+import com.analyticalsolution.analyticalsolution.utils.ProductRowMapper;
 import com.analyticalsolution.analyticalsolution.utils.UtilityService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -56,4 +58,15 @@ public class ProductService {
         }
     }
 
+    // Fetch all products
+    public List<Product> fetchAllProducts() {
+        try {
+            String sql = "SELECT product_id, product_name, product_desc, product_category, estimated_delivery_time, product_price FROM products";
+
+            return jdbcTemplate.query(sql, new ProductRowMapper());
+        } catch (Exception e) {
+            log.error("Unexpected error fetching products: " + e.getMessage());
+            return null;
+        }
+    }
 }

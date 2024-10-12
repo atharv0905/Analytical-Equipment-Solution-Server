@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/product")
@@ -37,4 +39,5 @@ public class ProductController {
             return new ResponseEntity<>("Unexpected error adding product", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }
