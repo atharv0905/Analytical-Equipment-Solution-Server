@@ -2,8 +2,8 @@
  * File: JwtUtils.java
  * Author: Atharv Mirgal
  * Description: Utility class for handling JSON Web Token (JWT) operations including token generation,
- * extraction of claims (such as username and expiration), and validation of tokens.
- * This class provides methods to create and manage JWT tokens securely using HMAC signing.
+ *              extraction of claims (such as username and expiration), and validation of tokens.
+ *              This class provides methods to create and manage JWT tokens securely using HMAC signing.
  * Created on: 11/10/2024
  * Last Modified: 11/10/2024
  */

@@ -45,6 +45,7 @@ public class SpringSecurity {
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers("/user/**").authenticated()
+                                .requestMatchers("/product/**").hasRole("ADMIN")
                                 .anyRequest().permitAll())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
