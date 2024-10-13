@@ -106,8 +106,8 @@ public class PublicController {
 
     // Fetch all products
     @GetMapping("/allProducts")
-    public ResponseEntity<?> getAllProducts(){
-        try{
+    public ResponseEntity<?> getAllProducts() {
+        try {
             List<Product> products = productService.fetchAllProducts();
             return new ResponseEntity<>(products, HttpStatus.OK);
         } catch (Exception e) {
