@@ -3,7 +3,7 @@
  * Author: Atharv Mirgal
  * Description: This configuration file sets up Spring Security for the application, enabling
  *              JWT-based authentication and specifying security policies. It configures
- *              authentication for "/user/**" endpoints, disables CSRF for stateless sessions,
+ *              authentication for "/user/**", "/email/**" endpoints, disables CSRF for stateless sessions,
  *              and integrates a JWT filter to validate tokens for secure requests.
  *              It also provides beans for PasswordEncoder using BCrypt and AuthenticationManager
  *              for managing authentication processes.
@@ -44,7 +44,7 @@ public class SpringSecurity {
                 .csrf().disable()
                 .authorizeHttpRequests(authorize ->
                         authorize
-                                .requestMatchers("/user/**").authenticated()
+                                .requestMatchers("/user/**", "/email/**").authenticated()
                                 .requestMatchers("/product/**").hasRole("ADMIN")
                                 .anyRequest().permitAll())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
