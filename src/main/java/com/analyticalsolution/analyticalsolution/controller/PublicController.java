@@ -1,13 +1,15 @@
 /**
  * File: PublicController.java
  * Author: Atharv Mirgal
- * Description: This controller handles public API endpoints for user authentication and registration.
- *              It includes methods for user signup, login, token verification, and server status check.
- *              Additionally, it offers temporary endpoints for fetching user details by username or user ID.
- *              Utilizes JWT for secure authentication and logs errors for troubleshooting.
+ * Description: This controller manages public API endpoints for user authentication, registration, and product retrieval.
+ *              It includes methods for user signup, login, token verification, and server status checks, offering secure
+ *              authentication using JWT. Additionally, it provides endpoints for fetching all products or a product by ID,
+ *              and includes temporary methods for fetching user details by username or user ID for testing purposes.
+ *              Utilizes Spring Security for authentication and logs errors to assist in troubleshooting.
  * Created on: 11/10/2024
- * Last Modified: 11/10/2024
+ * Last Modified: 13/10/2024
  */
+
 
 package com.analyticalsolution.analyticalsolution.controller;
 
@@ -15,6 +17,7 @@ import com.analyticalsolution.analyticalsolution.entity.Product;
 import com.analyticalsolution.analyticalsolution.requests.LoginRequest;
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
+import com.analyticalsolution.analyticalsolution.responses.FetchProductsResponse;
 import com.analyticalsolution.analyticalsolution.responses.TokenAuthResponse;
 import com.analyticalsolution.analyticalsolution.service.ProductService;
 import com.analyticalsolution.analyticalsolution.service.UserDetailsServiceImpl;
@@ -108,10 +111,27 @@ public class PublicController {
     @GetMapping("/allProducts")
     public ResponseEntity<?> getAllProducts() {
         try {
-            List<Product> products = productService.fetchAllProducts();
+            List<FetchProductsResponse> products = productService.fetchAllProducts();
             return new ResponseEntity<>(products, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Unexpected error while fetching products", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Fetch product by id
+    @PostMapping("/getProduct")
+    public ResponseEntity<?> getProductById(@RequestParam("productID") String productId) {
+        try {
+            Product product = productService.fetchProductById(productId);
+
+            if (product != null) {
+                return new ResponseEntity<>(product, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            log.error("Unexpected error fetching product: ", e);
+            return new ResponseEntity<>("Unexpected error fetching product", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

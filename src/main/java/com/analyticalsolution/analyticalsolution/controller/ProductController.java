@@ -1,3 +1,15 @@
+/**
+ * File: ProductController.java
+ * Author: Atharv Mirgal
+ * Description: This controller handles API endpoints related to product management, including adding, updating,
+ *              and deleting products. It accepts product details and multiple images for product creation and updates,
+ *              ensuring all required fields are provided. It uses the ProductService for business logic and handles
+ *              potential errors gracefully with appropriate responses. All operations log relevant messages to assist
+ *              with troubleshooting and maintain transparency in product-related actions.
+ * Created on: 12/10/2024
+ * Last Modified: 13/10/2024
+ */
+
 package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.entity.Product;
@@ -8,8 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -40,4 +50,42 @@ public class ProductController {
         }
     }
 
+    // Delete product
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteProduct(@RequestParam("productID") String productID) {
+        try {
+            // Call the service method to delete the product
+            int result = productService.deleteProduct(productID);
+
+            if (result > 0) {
+                return new ResponseEntity<>("Product deleted successfully", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            log.error("Unexpected error deleting product: ", e);
+            return new ResponseEntity<>("Unexpected error deleting product", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Update product
+    @PutMapping("/update")
+    public ResponseEntity<?> updateProduct(@ModelAttribute Product product, @RequestParam("productImages") MultipartFile[] productImages) {
+        try {
+            if (productImages == null || productImages.length == 0) {
+                return new ResponseEntity<>("Product images are required", HttpStatus.BAD_REQUEST);
+            }
+
+            int result = productService.updateProduct(product, productImages);
+            if (result == -1) {
+                // Product update failed
+                return new ResponseEntity<>("Product update failed: Invalid data.", HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<>("Product updated successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Unexpected error updating product: ", e);
+            return new ResponseEntity<>("Unexpected error updating product", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

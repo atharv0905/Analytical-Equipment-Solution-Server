@@ -1,6 +1,20 @@
+/**
+ * File: UtilityService.java
+ * Author: Atharv Mirgal
+ * Description: This service provides utility functions for handling file operations, including saving and deleting
+ *              product images on the server. It supports storing image files in a specified upload directory
+ *              and returning relative paths for database storage. Additionally, it allows for deleting images
+ *              associated with products when they are updated or removed.
+ *              The service uses the Spring @Value annotation to load the base URL and upload directory from
+ *              application properties, ensuring flexibility in file storage configuration.
+ * Created on: 13/10/2024
+ * Last Modified: 13/10/2024
+ */
+
 package com.analyticalsolution.analyticalsolution.utils;
 
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,8 +24,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 @Service
+@Slf4j
 public class UtilityService {
 
     @Autowired
@@ -47,6 +63,22 @@ public class UtilityService {
             return fileName;
         } catch (IOException e) {
             return null; // Return null if there was an error
+        }
+    }
+
+    // Method to delete images
+    public void deleteImages(List<String> imagePaths) {
+        for (String imagePath : imagePaths) {
+            try {
+                File file = new File(UPLOAD_DIR, imagePath);
+                if (file.exists() && file.delete()) {
+                    log.info("Deleted image: " + imagePath);
+                } else {
+                    log.warn("Failed to delete image: " + imagePath);
+                }
+            } catch (Exception e) {
+                log.error("Error deleting image file: " + e.getMessage());
+            }
         }
     }
 

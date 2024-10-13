@@ -1,3 +1,15 @@
+/**
+ * File: ProductRowMapper.java
+ * Author: Atharv Mirgal
+ * Description: This utility class is a custom implementation of the RowMapper interface for mapping database
+ *              rows to Product entities. It is designed to convert the result set from a SQL query into a
+ *              Product object, including deserialization of JSON strings that represent image paths. The
+ *              class appends a base URL to each image path for serving the images correctly. This helps in
+ *              transforming the data stored in the database into a usable format for the application.
+ * Created on: 13/10/2024
+ * Last Modified: 13/10/2024
+ */
+
 package com.analyticalsolution.analyticalsolution.utils;
 
 import com.analyticalsolution.analyticalsolution.entity.Product;
