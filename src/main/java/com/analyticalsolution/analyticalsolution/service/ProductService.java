@@ -82,7 +82,7 @@ public class ProductService {
     // Fetch all products
     public List<FetchProductsResponse> fetchAllProducts() {
         try {
-            String sql = "SELECT product_id, product_name, product_images FROM products";
+            String sql = "SELECT product_id, product_name, product_desc, product_category, product_images FROM products";
 
             return jdbcTemplate.query(sql, new ProductsRowMapper());
         } catch (Exception e) {
@@ -104,7 +104,6 @@ public class ProductService {
             return null;
         }
     }
-
 
     // Delete product
     public int deleteProduct(String productId) {

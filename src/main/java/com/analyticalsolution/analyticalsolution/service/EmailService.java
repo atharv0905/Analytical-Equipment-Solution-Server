@@ -22,6 +22,7 @@ public class EmailService {
     private static final String sentTo = "atharvmirgal09@gmail.com";
 
     public String sendMail(String subject, String body){
+        System.out.println("mail request hit");
         try{
             String encodedSubject = UriUtils.encode(subject, StandardCharsets.UTF_8);
             String encodedBody = UriUtils.encode(body, StandardCharsets.UTF_8);

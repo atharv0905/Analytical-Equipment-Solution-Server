@@ -58,7 +58,7 @@ public class PublicController {
     private ProductService productService;
 
     // Check whether the server is running
-    @GetMapping("/")
+    @GetMapping()
     public String serverCheck(){
         return "Server is running...";
     }
@@ -119,8 +119,8 @@ public class PublicController {
     }
 
     // Fetch product by id
-    @PostMapping("/getProduct")
-    public ResponseEntity<?> getProductById(@RequestParam("productID") String productId) {
+    @GetMapping("/getProduct/{productId}")
+    public ResponseEntity<?> getProductById(@PathVariable String productId) {
         try {
             Product product = productService.fetchProductById(productId);
 

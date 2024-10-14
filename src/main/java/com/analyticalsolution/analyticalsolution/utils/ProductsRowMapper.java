@@ -33,6 +33,8 @@ public class ProductsRowMapper implements RowMapper<FetchProductsResponse> {
         FetchProductsResponse product = new FetchProductsResponse();
         product.setProduct_id(rs.getString("product_id"));
         product.setProduct_name(rs.getString("product_name"));
+        product.setProduct_desc(rs.getString("product_desc"));
+        product.setProduct_category(rs.getString("product_category"));
 
         // Convert JSON string to List<String>
         String imagesJson = rs.getString("product_images");

@@ -25,5 +25,9 @@ public class FetchProductsResponse {
 
     private String product_name;
 
+    private String product_desc;
+
+    private String product_category;
+
     private String product_image;
 }

@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -71,6 +72,9 @@ public class CartController {
     public ResponseEntity<?> fetchAllCartItems(){
         try{
             List<CartDetailsResponse> allItems = cartService.getAllItems();
+            if(allItems == null){
+                allItems = new ArrayList<>();
+            }
             return new ResponseEntity<>(allItems, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error occurred while deleting item", HttpStatus.INTERNAL_SERVER_ERROR);

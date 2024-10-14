@@ -5,7 +5,7 @@
  *              It provides an endpoint to update user information, and handles different response statuses
  *              based on the success or failure of the update operation. Logs errors for debugging purposes.
  * Created on: 11/10/2024
- * Last Modified: 11/10/2024
+ * Last Modified: 14/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.controller;
@@ -49,4 +49,15 @@ public class UserController {
         }
     }
 
+    // Delete user
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteUser(){
+        try{
+            userService.deleteUser();
+            return new ResponseEntity<>("User deleted successfully",HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error deleting user: " + e.getMessage());
+            return new ResponseEntity<>("Error deleting user: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

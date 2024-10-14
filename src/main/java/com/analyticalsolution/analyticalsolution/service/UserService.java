@@ -15,6 +15,8 @@ import com.analyticalsolution.analyticalsolution.utils.UtilityService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -109,6 +111,23 @@ public class UserService {
         } catch (Exception e) {
             log.error("Unexpected error updating user: " + e.getMessage());
             return -1;
+        }
+    }
+
+    // Delete user
+    public void deleteUser(){
+        try{
+            // Check if the user exists
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User existingUser = userRepository.findUserByUsername(authentication.getName().toString());
+            if (existingUser == null) {
+                log.error("User not found.");
+            }
+
+            String sql = "DELETE FROM users WHERE id = ?";
+            jdbcTemplate.update(sql, existingUser.getId());
+        } catch (Exception e) {
+            log.error("Error deleting user: " + e.getMessage());
         }
     }
 
