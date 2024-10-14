@@ -14,6 +14,8 @@
 package com.analyticalsolution.analyticalsolution.utils;
 
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -82,4 +85,25 @@ public class UtilityService {
         }
     }
 
+    // Helper method to parse a JSON string into a List of strings
+    public List<String> parseJsonToList(String json) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(json, new TypeReference<List<String>>() {});
+        } catch (Exception e) {
+            log.error("Failed to parse JSON: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    // Helper method to convert a List of strings to a JSON string
+    public String convertListToJson(List<String> list) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(list);
+        } catch (Exception e) {
+            log.error("Failed to convert list to JSON: " + e.getMessage());
+            return "[]";
+        }
+    }
 }
