@@ -8,7 +8,7 @@
  *              It also provides beans for PasswordEncoder using BCrypt and AuthenticationManager
  *              for managing authentication processes.
  * Created on: 11/10/2024
- * Last Modified: 11/10/2024
+ * Last Modified: 15/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.config;
@@ -45,7 +45,7 @@ public class SpringSecurity {
                 .csrf().disable()
                 .authorizeHttpRequests(authorize ->
                         authorize
-                                .requestMatchers("/user/**", "/cart/**").authenticated()
+                                .requestMatchers("/user/**", "/cart/**", "/order/**").authenticated()
                                 .requestMatchers("/product/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .anyRequest().permitAll())
