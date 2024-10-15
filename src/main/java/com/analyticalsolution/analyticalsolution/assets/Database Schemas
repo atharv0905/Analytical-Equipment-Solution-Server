@@ -1,0 +1,58 @@
+CREATE TABLE users (
+    id VARCHAR(500) PRIMARY KEY NOT NULL UNIQUE,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phone BIGINT NOT NULL UNIQUE,
+    address JSON,
+    roles JSON NOT NULL
+);
+
+CREATE TABLE products (
+    product_id VARCHAR(500) PRIMARY KEY NOT NULL UNIQUE,
+    product_name VARCHAR(255) NOT NULL,
+    product_desc VARCHAR(1000) NOT NULL,
+    product_category VARCHAR(100) NOT NULL,
+    estimated_delivery_time VARCHAR(255) NOT NULL,
+    product_price BIGINT NOT NULL,
+    product_images JSON NOT NULL
+);
+
+CREATE TABLE cart (
+	cart_id VARCHAR(500) PRIMARY KEY NOT NULL UNIQUE,
+    customer_id VARCHAR(500) NOT NULL UNIQUE,
+    FOREIGN KEY (customer_id) REFERENCES users(id),
+    item_ids JSON NOT NULL
+);
+
+CREATE TABLE cartitems (
+	item_id VARCHAR(500) PRIMARY KEY NOT NULL UNIQUE,
+    product_id VARCHAR(255) NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    quantity BIGINT NOT NULL
+);
+
+CREATE TABLE orders (
+	order_id VARCHAR(500) PRIMARY KEY NOT NULL UNIQUE,
+    product_id VARCHAR(500) NOT NULL UNIQUE,
+    quantity BIGINT NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    order_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE sales (
+	sale_id VARCHAR(500) PRIMARY KEY NOT NULL UNIQUE,
+    customer_id VARCHAR(500) NOT NULL UNIQUE,
+    FOREIGN KEY (customer_id) REFERENCES users(id),
+    order_ids JSON NOT NULL,
+    order_confirmation_status VARCHAR(100) NOT NULL,
+	order_status VARCHAR(100) NOT NULL,
+    shipping_address VARCHAR(500) NOT NULL,
+    contact_phone BIGINT NOT NULL,
+    transaction_id VARCHAR(500) NOT NULL UNIQUE,
+    payment_status VARCHAR(100) NOT NULL,
+    invoice_number VARCHAR(500) NOT NULL UNIQUE,
+    sale_mode VARCHAR(100) NOT NULL,
+    order_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+ );
