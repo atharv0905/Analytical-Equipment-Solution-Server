@@ -18,6 +18,7 @@ import com.analyticalsolution.analyticalsolution.requests.LoginRequest;
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
 import com.analyticalsolution.analyticalsolution.responses.FetchProductsResponse;
+import com.analyticalsolution.analyticalsolution.responses.LoginResponse;
 import com.analyticalsolution.analyticalsolution.responses.TokenAuthResponse;
 import com.analyticalsolution.analyticalsolution.service.ProductService;
 import com.analyticalsolution.analyticalsolution.service.UserDetailsServiceImpl;
@@ -87,7 +88,9 @@ public class PublicController {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
             UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
             String jwtToken = jwtUtils.generateToken(userDetails.getUsername());
-            return new ResponseEntity<>(jwtToken, HttpStatus.OK);
+            User user = userRepository.findUserByUsername(loginRequest.getUsername());
+            LoginResponse loginResponse = new LoginResponse(jwtToken, user);
+            return new ResponseEntity<>(loginResponsestat, HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

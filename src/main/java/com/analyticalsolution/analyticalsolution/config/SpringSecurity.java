@@ -45,7 +45,7 @@ public class SpringSecurity {
                 .csrf().disable()
                 .authorizeHttpRequests(authorize ->
                         authorize
-                                .requestMatchers("/user/**", "/cart/**", "/order/**", "/email/**").authenticated()
+                                .requestMatchers("/user/**", "/cart/**", "/order/**", "/email/**", "/payment/**").authenticated()
                                 .requestMatchers("/product/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .anyRequest().permitAll())
