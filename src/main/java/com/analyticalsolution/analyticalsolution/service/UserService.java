@@ -3,7 +3,7 @@
  * Author: Atharv Mirgal
  * Description: Service layer for managing user-related operations including user creation, updating, and token verification.
  * Created on: 11/10/2024
- * Last Modified: 11/10/2024
+ * Last Modified: 16/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.service;
@@ -15,8 +15,6 @@ import com.analyticalsolution.analyticalsolution.utils.UtilityService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,14 +49,15 @@ public class UserService {
                 return -1;
             }
 
-            String sql = "INSERT INTO users (id, username, name, password, email, phone, address, roles) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO users (id, username, name, password, email, phone, address, roles, verified) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             String rolesJson = objectMapper.writeValueAsString(user.getRoles());
             String addressJson = objectMapper.writeValueAsString(user.getAddresses());
 
             user.setId(UUID.randomUUID().toString());
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setIsVerified(false);
 
             return jdbcTemplate.update(sql,
                     user.getId(),
@@ -68,7 +67,8 @@ public class UserService {
                     user.getEmail(),
                     user.getPhone(),
                     addressJson,
-                    rolesJson);
+                    rolesJson,
+                    user.getIsVerified());
         } catch (Exception e) {
             log.error("Unexpected error creating user: " + e.getMessage());
             return -1;

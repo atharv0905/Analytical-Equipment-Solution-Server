@@ -35,7 +35,17 @@ spring:
     resources:
       static-locations: file:///D:/AES/ProductImages/
 
-
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: atharvmirgal09@gmail.com
+    password: tttj iinq wzwh rshm
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 app:
   base-url: http://localhost:3000/

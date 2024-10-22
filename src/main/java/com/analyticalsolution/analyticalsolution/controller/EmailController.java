@@ -25,10 +25,10 @@ public class EmailController {
     @Autowired
     private EmailService emailService;
 
-    @PostMapping()
+    @PostMapping("/contact")
     public ResponseEntity<?> sendMail(@RequestBody EmailRequest emailRequest){
         try{
-            String url = emailService.sendMail(emailRequest.getSubject(), emailRequest.getBody());
+            String url = emailService.sendDraftMail(emailRequest.getSubject(), emailRequest.getBody());
             return new ResponseEntity<>(url, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Error while sending email: " + e.getMessage());
@@ -36,4 +36,14 @@ public class EmailController {
         }
     }
 
+    @GetMapping("/verification")
+    public ResponseEntity<?> sendVerificationMail(){
+        try{
+            emailService.sendVerificationMail();
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error while sending email: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

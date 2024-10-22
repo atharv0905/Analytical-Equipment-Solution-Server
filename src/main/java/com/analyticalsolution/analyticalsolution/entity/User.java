@@ -49,4 +49,6 @@ public class User {
     @NonNull
     private ArrayList<String> roles = new ArrayList<>();
 
+    private Boolean isVerified;
+
 }
