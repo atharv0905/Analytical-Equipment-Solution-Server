@@ -37,9 +37,9 @@ public class JwtUtils {
     }
 
     // Generate verification token
-    public String generateVerificationToken(String username){
+    public String generateVerificationToken(String email){
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return createToken(claims, email);
     }
 
     // Creating a token

@@ -11,6 +11,7 @@ package com.analyticalsolution.analyticalsolution.service;
 
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
+import com.analyticalsolution.analyticalsolution.requests.EmailVerificationRequest;
 import com.analyticalsolution.analyticalsolution.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,19 +66,11 @@ public class EmailService {
         }
     }
 
-    public void sendVerificationMail(){
+    public void sendVerificationMail(String email){
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            User existingUser = userRepository.findUserByUsername(authentication.getName().toString());
-            if (existingUser == null) {
-                log.error("User not found.");
-            }
-
-            String email = existingUser.getEmail();
             System.out.println(email);
-            String username = existingUser.getUsername();
 
-            String token = jwtUtils.generateVerificationToken(username);
+            String token = jwtUtils.generateVerificationToken(email);
 
             MimeMessagePreparator messagePreparator = mimeMessage -> {
                 MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -94,22 +87,39 @@ public class EmailService {
                 messageHelper.setText(body, true); // Set the second parameter to 'true' for HTML content
             };
 
+            String checkUsersSql = "SELECT COUNT(*) FROM users WHERE email = ?";
+            String checkEmailVerificationSql = "SELECT COUNT(*) FROM email_verification WHERE email = ?";
+            String deleteEmailVerificationSql = "DELETE FROM email_verification WHERE email = ?";
+            String insertEmailVerificationSql = "INSERT INTO email_verification(email, verified) VALUES(?, ?)";
+
+            int userCount = jdbcTemplate.queryForObject(checkUsersSql, new Object[]{email}, Integer.class);
+
+            if (userCount == 0) {
+                int verificationCount = jdbcTemplate.queryForObject(checkEmailVerificationSql, new Object[]{email}, Integer.class);
+
+                if (verificationCount > 0) {
+                    jdbcTemplate.update(deleteEmailVerificationSql, email);
+                }
+
+                jdbcTemplate.update(insertEmailVerificationSql, email, false);
+            }
+
             javaMailSender.send(messagePreparator);
         } catch (Exception e) {
             log.error("Exception while sending email: " + e);
         }
     }
 
-    public Boolean verifyEmail(){
+    public Boolean verifyEmail(EmailVerificationRequest emailVerificationRequest){
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            User existingUser = userRepository.findUserByUsername(authentication.getName().toString());
-            if(existingUser != null){
-                String sql = "UPDATE users SET verified = ? WHERE username = ?";
-                jdbcTemplate.update(sql, true, existingUser.getUsername());
+            Boolean isValid = jwtUtils.validateToken(emailVerificationRequest.getToken());
+            if(isValid){
+                System.out.println("Email verified");
+                String sql = "UPDATE email_verification SET verified = ? WHERE email = ?";
+                jdbcTemplate.update(sql, true, emailVerificationRequest.getEmail());
                 return true;
             }
-            return false;
+            return true;
         } catch (Exception e) {
             return false;
         }

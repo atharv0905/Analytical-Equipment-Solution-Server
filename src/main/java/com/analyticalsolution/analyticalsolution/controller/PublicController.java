@@ -15,6 +15,7 @@ package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.entity.Product;
 import com.analyticalsolution.analyticalsolution.requests.EmailRequest;
+import com.analyticalsolution.analyticalsolution.requests.EmailVerificationRequest;
 import com.analyticalsolution.analyticalsolution.requests.LoginRequest;
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
@@ -67,6 +68,30 @@ public class PublicController {
     @GetMapping()
     public String serverCheck(){
         return "Server is running...";
+    }
+
+    // Send verification email
+    @PostMapping("/verification")
+    public ResponseEntity<?> sendVerificationMail(@RequestParam String email){
+        try{
+            emailService.sendVerificationMail(email);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error while sending email: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Verify email
+    @PostMapping("/verify")
+    public ResponseEntity<?> verify(@RequestBody EmailVerificationRequest emailVerificationRequest){
+        try{
+            Boolean isValid = emailService.verifyEmail(emailVerificationRequest);
+            return new ResponseEntity<>(isValid, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error while verifying email: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // Create new user

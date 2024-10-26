@@ -29,25 +29,4 @@ public class EmailController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    @GetMapping("/verification")
-    public ResponseEntity<?> sendVerificationMail(){
-        try{
-            emailService.sendVerificationMail();
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Error while sending email: " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/verify")
-    public ResponseEntity<?> verify(){
-        try{
-            Boolean isValid = emailService.verifyEmail();
-            return new ResponseEntity<>(isValid, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Error while verifying email: " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }

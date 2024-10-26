@@ -43,21 +43,38 @@ public class UserService {
     // Create new user
     public int createUser(User user) {
         try {
+            String checkEmailVerificationSql = "SELECT COUNT(*) FROM email_verification WHERE email = ?";
+            int verificationCount = jdbcTemplate.queryForObject(checkEmailVerificationSql, new Object[]{user.getEmail()}, Integer.class);
+
+            if(verificationCount > 0){
+                String checkVerificationStatus = "SELECT verified FROM email_verification WHERE email = ?";
+                Boolean isVerified = jdbcTemplate.queryForObject(checkVerificationStatus, new Object[]{user.getEmail()}, Boolean.class);
+
+                if (isVerified == null || !isVerified) {
+                    log.error("Email not verified for: " + user.getEmail());
+                    return -1;
+                }
+            }else {
+                log.error("Email does not exist in the verification table: " + user.getEmail());
+                return -1;
+            }
             User existingUser = userRepository.findUserByUsername(user.getUsername());
             if (existingUser != null) {
                 log.error("User with username " + user.getUsername() + " already exists.");
                 return -1;
             }
 
-            String sql = "INSERT INTO users (id, username, name, password, email, phone, address, roles, verified) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO users (id, username, name, password, email, phone, address, roles) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             String rolesJson = objectMapper.writeValueAsString(user.getRoles());
             String addressJson = objectMapper.writeValueAsString(user.getAddresses());
 
             user.setId(UUID.randomUUID().toString());
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setIsVerified(false);
+
+            String deleteEmailVerificationSql = "DELETE FROM email_verification WHERE email = ?";
+            jdbcTemplate.update(deleteEmailVerificationSql, user.getEmail());
 
             return jdbcTemplate.update(sql,
                     user.getId(),
@@ -67,8 +84,7 @@ public class UserService {
                     user.getEmail(),
                     user.getPhone(),
                     addressJson,
-                    rolesJson,
-                    user.getIsVerified());
+                    rolesJson);
         } catch (Exception e) {
             log.error("Unexpected error creating user: " + e.getMessage());
             return -1;
@@ -80,7 +96,7 @@ public class UserService {
         try {
             // Check if the user exists
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            User existingUser = userRepository.findUserByUsername(authentication.getName().toString());
+            User existingUser = userRepository.findUserByUsername(authentication.getName());
             if (existingUser == null) {
                 log.error("User not found.");
                 return -1;
@@ -119,7 +135,7 @@ public class UserService {
         try{
             // Check if the user exists
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            User existingUser = userRepository.findUserByUsername(authentication.getName().toString());
+            User existingUser = userRepository.findUserByUsername(authentication.getName());
             if (existingUser == null) {
                 log.error("User not found.");
             }
