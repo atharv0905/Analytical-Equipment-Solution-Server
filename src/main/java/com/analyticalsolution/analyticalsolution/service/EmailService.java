@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -38,6 +39,9 @@ public class EmailService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private static final String BASE_URL = "http://localhost:3000/";
 
@@ -70,9 +74,10 @@ public class EmailService {
             }
 
             String email = existingUser.getEmail();
+            System.out.println(email);
             String username = existingUser.getUsername();
 
-            String token = jwtUtils.generateToken(username);
+            String token = jwtUtils.generateVerificationToken(username);
 
             MimeMessagePreparator messagePreparator = mimeMessage -> {
                 MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -83,7 +88,7 @@ public class EmailService {
                 // Define HTML content for the email body
                 String body = "<h1>Email Verification</h1>" +
                         "<p>Please click the link below to verify your email address:</p>" +
-                        "<a href='" + token + "' style='display: inline-block; padding: 10px 20px; " +
+                        "<a href='" + "http://localhost:5501/user/view/email-verify.html?token=" + token + "' style='display: inline-block; padding: 10px 20px; " +
                         "background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px;'>Verify Email</a>";
 
                 messageHelper.setText(body, true); // Set the second parameter to 'true' for HTML content
@@ -92,6 +97,21 @@ public class EmailService {
             javaMailSender.send(messagePreparator);
         } catch (Exception e) {
             log.error("Exception while sending email: " + e);
+        }
+    }
+
+    public Boolean verifyEmail(){
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User existingUser = userRepository.findUserByUsername(authentication.getName().toString());
+            if(existingUser != null){
+                String sql = "UPDATE users SET verified = ? WHERE username = ?";
+                jdbcTemplate.update(sql, true, existingUser.getUsername());
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
         }
     }
 

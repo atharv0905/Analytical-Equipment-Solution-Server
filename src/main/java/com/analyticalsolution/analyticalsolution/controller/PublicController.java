@@ -14,12 +14,14 @@
 package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.entity.Product;
+import com.analyticalsolution.analyticalsolution.requests.EmailRequest;
 import com.analyticalsolution.analyticalsolution.requests.LoginRequest;
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
 import com.analyticalsolution.analyticalsolution.responses.FetchProductsResponse;
 import com.analyticalsolution.analyticalsolution.responses.LoginResponse;
 import com.analyticalsolution.analyticalsolution.responses.TokenAuthResponse;
+import com.analyticalsolution.analyticalsolution.service.EmailService;
 import com.analyticalsolution.analyticalsolution.service.ProductService;
 import com.analyticalsolution.analyticalsolution.service.UserDetailsServiceImpl;
 import com.analyticalsolution.analyticalsolution.service.UserService;
@@ -56,6 +58,9 @@ public class PublicController {
     private JwtUtils jwtUtils;
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private ProductService productService;
 
     // Check whether the server is running
@@ -90,7 +95,7 @@ public class PublicController {
             String jwtToken = jwtUtils.generateToken(userDetails.getUsername());
             User user = userRepository.findUserByUsername(loginRequest.getUsername());
             LoginResponse loginResponse = new LoginResponse(jwtToken, user);
-            return new ResponseEntity<>(loginResponsestat, HttpStatus.OK);
+            return new ResponseEntity<>(loginResponse, HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -118,6 +123,18 @@ public class PublicController {
             return new ResponseEntity<>(products, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Unexpected error while fetching products", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Contact
+    @PostMapping("/contact")
+    public ResponseEntity<?> sendMail(@RequestBody EmailRequest emailRequest){
+        try{
+            String url = emailService.sendDraftMail(emailRequest.getSubject(), emailRequest.getBody());
+            return new ResponseEntity<>(url, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error while sending email: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

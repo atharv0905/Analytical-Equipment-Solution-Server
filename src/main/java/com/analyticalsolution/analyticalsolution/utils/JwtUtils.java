@@ -36,6 +36,12 @@ public class JwtUtils {
         return createToken(claims, username);
     }
 
+    // Generate verification token
+    public String generateVerificationToken(String username){
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, username);
+    }
+
     // Creating a token
     private String createToken(Map<String, Object> claims, String subject){
         return Jwts.builder()
@@ -45,6 +51,19 @@ public class JwtUtils {
                 .and()
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    // Creating a token
+    private String createVerificationToken(Map<String, Object> claims, String subject){
+        return Jwts.builder()
+                .claims(claims)
+                .subject(subject)
+                .header().empty().add("typ", "JWT")
+                .and()
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
                 .signWith(getSigningKey())
                 .compact();
     }

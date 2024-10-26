@@ -19,6 +19,7 @@ public class PaymentController {
     public ResponseEntity<?> createOrder(@PathVariable Integer data) throws Exception {
 
         int amt = data;
+        System.out.println("Amount: " + amt);
         // Initialize Razorpay client with your key and secret
         RazorpayClient razorpay = new RazorpayClient("rzp_test_hD75gZIHGX2XGb", "y0ZZRJJa2QUwe9c8w2VUqUeG");
 
