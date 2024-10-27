@@ -8,7 +8,7 @@
  *              The service is designed to handle various exceptions gracefully, logging errors and providing
  *              meaningful responses.
  * Created on: 12/10/2024
- * Last Modified: 13/10/2024
+ * Last Modified: 27/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.service;
@@ -43,8 +43,8 @@ public class ProductService {
     // Add new product
     public int addProduct(Product product, MultipartFile[] productImages) {
         try {
-            String sql = "INSERT INTO products (product_id, product_name, product_desc, product_category, estimated_delivery_time, product_price, product_images) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO products (product_id, product_name, product_desc, product_category, estimated_delivery_time, product_price, product_status, product_images) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             // Generate a unique ID for the product
             product.setProduct_id(UUID.randomUUID().toString());
@@ -63,7 +63,7 @@ public class ProductService {
 
             // Convert image paths list to JSON string for database storage
             String imagesJson = new ObjectMapper().writeValueAsString(imagePaths);
-
+            int defaultProductStatus = 1;
             // Update the database with the product information
             return jdbcTemplate.update(sql,
                     product.getProduct_id(),
@@ -72,6 +72,7 @@ public class ProductService {
                     product.getProduct_category(),
                     product.getEstimated_delivery_time(),
                     product.getProduct_price(),
+                    defaultProductStatus,
                     imagesJson);
         } catch (Exception e) {
             log.error("Unexpected error adding product: " + e.getMessage());
@@ -160,13 +161,14 @@ public class ProductService {
             String imagesJsonNew = new ObjectMapper().writeValueAsString(imagePaths);
 
             // Update the database with the new product information
-            String sqlUpdate = "UPDATE products SET product_name = ?, product_desc = ?, product_category = ?, estimated_delivery_time = ?, product_price = ?, product_images = ? WHERE product_id = ?";
+            String sqlUpdate = "UPDATE products SET product_name = ?, product_desc = ?, product_category = ?, estimated_delivery_time = ?, product_price = ?, product_status = ?, product_images = ? WHERE product_id = ?";
             return jdbcTemplate.update(sqlUpdate,
                     product.getProduct_name(),
                     product.getProduct_desc(),
                     product.getProduct_category(),
                     product.getEstimated_delivery_time(),
                     product.getProduct_price(),
+                    product.getProduct_status(),
                     imagesJsonNew,
                     product.getProduct_id());
         } catch (Exception e) {

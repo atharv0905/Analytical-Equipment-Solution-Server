@@ -1,10 +1,13 @@
 /**
  * File: UserService.java
  * Author: Atharv Mirgal
- * Description: Service layer for managing user-related operations including user creation, updating, and token verification.
+ * Description: Service layer for managing user-related operations such as user creation, password reset, and updates.
+ *              Includes functionality for verifying user tokens, deleting users, and checking email verification status.
+ *              The service integrates with the database and repository to perform these operations and maintains secure password encoding.
  * Created on: 11/10/2024
- * Last Modified: 16/10/2024
+ * Last Modified: 27/10/2024
  */
+
 
 package com.analyticalsolution.analyticalsolution.service;
 

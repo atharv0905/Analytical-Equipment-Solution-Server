@@ -1,11 +1,14 @@
 /**
  * File: EmailService.java
  * Author: Atharv Mirgal
- * Description: This service provides functionality for creating a URL to send emails using Gmail's web interface.
- *              It takes an email subject and body, encodes them, and generates a pre-filled email draft URL.
+ * Description: This service handles email operations, including generating draft URLs for emails, sending verification and
+ *              password reset emails, and verifying email tokens. The service uses Gmail's web interface to create pre-filled
+ *              draft emails with encoded subjects and bodies. Verification tokens are generated using JWT and stored in the database
+ *              for validation purposes. The service interacts with the database to ensure email uniqueness and to track email verification status.
  * Created on: 13/10/2024
- * Last Modified: 16/10/2024
+ * Last Modified: 27/10/2024
  */
+
 
 package com.analyticalsolution.analyticalsolution.service;
 

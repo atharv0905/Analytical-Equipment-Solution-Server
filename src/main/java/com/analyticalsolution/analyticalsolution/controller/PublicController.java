@@ -1,14 +1,15 @@
 /**
  * File: PublicController.java
  * Author: Atharv Mirgal
- * Description: This controller manages public API endpoints for user authentication, registration, and product retrieval.
- *              It includes methods for user signup, login, token verification, and server status checks, offering secure
- *              authentication using JWT. Additionally, it provides endpoints for fetching all products or a product by ID,
- *              and includes temporary methods for fetching user details by username or user ID for testing purposes.
- *              Utilizes Spring Security for authentication and logs errors to assist in troubleshooting.
+ * Description: This controller manages public-facing API endpoints for user-related actions like authentication, registration,
+ *              email verification, and product retrieval. It supports user signup, login, JWT-based token validation, and
+ *              email-related operations such as verification and password reset. Product endpoints allow retrieving all products
+ *              or specific products by ID. Additionally, it includes testing endpoints to fetch user details by username or user ID.
+ *              It utilizes Spring Security for authentication, JWT for secure sessions, and logs errors to aid in debugging.
  * Created on: 11/10/2024
- * Last Modified: 13/10/2024
+ * Last Modified: 27/10/2024
  */
+
 
 
 package com.analyticalsolution.analyticalsolution.controller;

@@ -1,12 +1,13 @@
 /**
  * File: UserController.java
  * Author: Atharv Mirgal
- * Description: This controller manages user-related operations such as updating user details.
- *              It provides an endpoint to update user information, and handles different response statuses
- *              based on the success or failure of the update operation. Logs errors for debugging purposes.
+ * Description: REST controller for user account management. Provides endpoints for updating user information,
+ *              resetting passwords, and deleting accounts, with response handling to communicate operation status.
+ *              Interacts with UserService for secure, efficient handling of user data and logs errors for troubleshooting.
  * Created on: 11/10/2024
- * Last Modified: 14/10/2024
+ * Last Modified: 27/10/2024
  */
+
 
 package com.analyticalsolution.analyticalsolution.controller;
 
@@ -50,7 +51,10 @@ public class UserController {
     }
 
     // Delete user
+    /*
+       This functionality won't be used any more
     @DeleteMapping("/delete")
+    */
     public ResponseEntity<?> deleteUser(){
         try{
             userService.deleteUser();

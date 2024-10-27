@@ -7,7 +7,7 @@
  *              The class is designed for use with a MongoDB database, using the `@Id` annotation
  *              for the primary key.
  * Created on: 11/10/2024
- * Last Modified: 11/10/2024
+ * Last Modified: 27/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.entity;

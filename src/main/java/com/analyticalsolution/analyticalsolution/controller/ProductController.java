@@ -7,7 +7,7 @@
  *              potential errors gracefully with appropriate responses. All operations log relevant messages to assist
  *              with troubleshooting and maintain transparency in product-related actions.
  * Created on: 12/10/2024
- * Last Modified: 13/10/2024
+ * Last Modified: 27/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.controller;
@@ -51,7 +51,10 @@ public class ProductController {
     }
 
     // Delete product
+    /*
+       This delete functionality is moved to update status of product
     @DeleteMapping("/delete")
+    */
     public ResponseEntity<?> deleteProduct(@RequestParam("productID") String productID) {
         try {
             // Call the service method to delete the product

@@ -8,7 +8,7 @@
  *              It also provides beans for PasswordEncoder using BCrypt and AuthenticationManager
  *              for managing authentication processes.
  * Created on: 11/10/2024
- * Last Modified: 15/10/2024
+ * Last Modified: 27/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.config;
