@@ -82,6 +82,21 @@ public class PublicController {
         }
     }
 
+    // Send password reset email
+    @PostMapping("/password-reset")
+    public ResponseEntity<?> sendPasswordMail(@RequestParam String email){
+        try{
+            Boolean isMailSent = emailService.sendPasswordResetMail(email);
+            if(isMailSent){
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            log.error("Error while sending email: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Verify email
     @PostMapping("/verify")
     public ResponseEntity<?> verify(@RequestBody EmailVerificationRequest emailVerificationRequest){
@@ -102,6 +117,11 @@ public class PublicController {
             if (result == -1) {
                 // User creation failed (either due to existing user or system error)
                 return new ResponseEntity<>("User creation failed: User already exists or invalid data.", HttpStatus.BAD_REQUEST);
+            }
+
+            if (result == -2) {
+                // User creation failed (either due to existing user or system error)
+                return new ResponseEntity<>("Email is not verified", HttpStatus.UNAUTHORIZED);
             }
 
             return new ResponseEntity<>("User created successfully", HttpStatus.CREATED);

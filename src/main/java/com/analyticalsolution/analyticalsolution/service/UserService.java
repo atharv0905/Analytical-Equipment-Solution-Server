@@ -52,11 +52,11 @@ public class UserService {
 
                 if (isVerified == null || !isVerified) {
                     log.error("Email not verified for: " + user.getEmail());
-                    return -1;
+                    return -2;
                 }
             }else {
                 log.error("Email does not exist in the verification table: " + user.getEmail());
-                return -1;
+                return -2;
             }
             User existingUser = userRepository.findUserByUsername(user.getUsername());
             if (existingUser != null) {
@@ -91,6 +91,34 @@ public class UserService {
         }
     }
 
+    // Reset password
+    public int resetPassword(String password){
+        try{
+            // Check if the user exists
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User existingUser = userRepository.findUserByUsername(authentication.getName());
+            if (existingUser == null) {
+                log.error("User not found.");
+                return -1;
+            }
+
+            String sql = "UPDATE users SET password = ? WHERE id = ?";
+
+            // If password is being updated, encode the new password
+            if (password != null && !password.isEmpty()) {
+                password = passwordEncoder.encode(password);
+            }
+
+            return jdbcTemplate.update(sql,
+                    password,
+                    existingUser.getId());
+
+        } catch (Exception e) {
+            log.error("Unexpected error resetting password: " + e.getMessage());
+            return -1;
+        }
+    }
+
     // Update existing user
     public int updateUser(User user) {
         try {
@@ -102,7 +130,7 @@ public class UserService {
                 return -1;
             }
 
-            String sql = "UPDATE users SET username = ?, name = ?, password = ?, email = ?, phone = ?, address = ?, roles = ? WHERE id = ?";
+            String sql = "UPDATE users SET username = ?, name = ?, email = ?, phone = ?, address = ?, roles = ? WHERE id = ?";
 
             // Convert roles and addresses to JSON
             String rolesJson = objectMapper.writeValueAsString(user.getRoles());
@@ -118,7 +146,6 @@ public class UserService {
             return jdbcTemplate.update(sql,
                     user.getUsername(),
                     user.getName(),
-                    user.getPassword(),
                     user.getEmail(),
                     user.getPhone(),
                     addressJson,

@@ -125,4 +125,46 @@ public class EmailService {
         }
     }
 
+    public Boolean sendPasswordResetMail(String email) {
+        try {
+            System.out.println(email);
+
+            // Query to find the username associated with the email
+            String getUserSql = "SELECT username FROM users WHERE email = ?";
+            String username = jdbcTemplate.queryForObject(getUserSql, new Object[]{email}, String.class);
+
+            if (username != null) {
+                String token = jwtUtils.generatePasswordToken(username); // Pass username instead of email
+
+                MimeMessagePreparator messagePreparator = mimeMessage -> {
+                    MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+                    messageHelper.setFrom("atharvmirgal09@gmail.com");
+                    messageHelper.setTo(email);
+                    messageHelper.setSubject("Reset Password");
+
+                    // Define HTML content for the email body
+                    String body = "<h1>Reset Password</h1>" +
+                            "<p>Please click the link below to reset your account password:</p>" +
+                            "<a href='" + "http://localhost:5501/user/view/email-verify.html?token=" + token + "' style='display: inline-block; padding: 10px 20px; " +
+                            "background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px;'>Reset Password</a>";
+
+                    messageHelper.setText(body, true); // Set to 'true' for HTML content
+                };
+
+                String checkUsersSql = "SELECT COUNT(*) FROM users WHERE email = ?";
+                int userCount = jdbcTemplate.queryForObject(checkUsersSql, new Object[]{email}, Integer.class);
+
+                if (userCount > 0) {
+                    javaMailSender.send(messagePreparator);
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        } catch (Exception e) {
+            log.error("Exception while sending email: " + e);
+            return false;
+        }
+    }
+
 }

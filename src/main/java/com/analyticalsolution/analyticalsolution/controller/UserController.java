@@ -60,4 +60,27 @@ public class UserController {
             return new ResponseEntity<>("Error deleting user: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    // Reset password
+    @PutMapping("/password-reset")
+    public ResponseEntity<?> resetPassword(@RequestParam String password) {
+        try {
+            // Call service method to update the user
+            int updateStatus = userService.resetPassword(password);
+
+            if (updateStatus == 1) {
+                // If update is successful, return 200 OK
+                return new ResponseEntity<>("Password updated successfully.", HttpStatus.OK);
+            } else if (updateStatus == -1) {
+                // If user is not found, return 404
+                return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+            } else {
+                // For other errors, return 500
+                return new ResponseEntity<>("Failed to reset password.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception e) {
+            log.error("Error updating user: " + e.getMessage());
+            return new ResponseEntity<>("Error resetting password: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
