@@ -7,7 +7,7 @@
  *              The class is designed for use with a MongoDB database, using the `@Id` annotation
  *              for the primary key.
  * Created on: 11/10/2024
- * Last Modified: 27/10/2024
+ * Last Modified: 28/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.entity;
@@ -19,6 +19,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.lang.NonNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -44,7 +45,7 @@ public class User {
     @NonNull
     private Long phone;
 
-    private ArrayList<String> addresses = new ArrayList<>();
+    private List<String> addresses = new ArrayList<>();
 
     @NonNull
     private ArrayList<String> roles = new ArrayList<>();

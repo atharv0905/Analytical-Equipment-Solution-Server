@@ -5,13 +5,14 @@
  *              Includes functionality for verifying user tokens, deleting users, and checking email verification status.
  *              The service integrates with the database and repository to perform these operations and maintains secure password encoding.
  * Created on: 11/10/2024
- * Last Modified: 27/10/2024
+ * Last Modified: 28/10/2024
  */
 
 
 package com.analyticalsolution.analyticalsolution.service;
 
 import com.analyticalsolution.analyticalsolution.entity.User;
+import com.analyticalsolution.analyticalsolution.entity.UserAddress;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
 import com.analyticalsolution.analyticalsolution.responses.TokenAuthResponse;
 import com.analyticalsolution.analyticalsolution.utils.UtilityService;
@@ -67,11 +68,10 @@ public class UserService {
                 return -1;
             }
 
-            String sql = "INSERT INTO users (id, username, name, password, email, phone, address, roles) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO users (id, username, name, password, email, phone, roles) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
             String rolesJson = objectMapper.writeValueAsString(user.getRoles());
-            String addressJson = objectMapper.writeValueAsString(user.getAddresses());
 
             user.setId(UUID.randomUUID().toString());
             user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -86,10 +86,80 @@ public class UserService {
                     user.getPassword(),
                     user.getEmail(),
                     user.getPhone(),
-                    addressJson,
                     rolesJson);
         } catch (Exception e) {
             log.error("Unexpected error creating user: " + e.getMessage());
+            return -1;
+        }
+    }
+
+    // Save user address
+    public int saveNewAddress(UserAddress address){
+        try{
+            // Check if the user exists
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User existingUser = userRepository.findUserByUsername(authentication.getName());
+            if (existingUser == null) {
+                log.error("User not found.");
+                return -2; // if user not exists
+            }
+            address.setId(UUID.randomUUID().toString());
+            address.setCustomer_id(existingUser.getId());
+
+            String sql = "INSERT INTO user_address (id, customer_id, address) " + "VALUES (?, ?, ?)";
+
+            return jdbcTemplate.update(sql,
+                    address.getId(),
+                    address.getCustomer_id(),
+                    address.getAddress());
+
+        } catch (Exception e) {
+            log.error("Error while saving new address" + e.getMessage());
+            return -1;
+        }
+    }
+
+    // Update saved address
+    public int updateAddress(UserAddress address){
+        try{
+            // Check if the user exists
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User existingUser = userRepository.findUserByUsername(authentication.getName());
+            if (existingUser == null) {
+                log.error("User not found.");
+                return -2; // if user not exists
+            }
+            address.setId(UUID.randomUUID().toString());
+            address.setCustomer_id(existingUser.getId());
+
+            String sql = "UPDATE user_address SET address = ? WHERE id = ?";
+
+            return jdbcTemplate.update(sql,
+                    address.getAddress(),
+                    address.getId());
+
+        } catch (Exception e) {
+            log.error("Error while updating address" + e.getMessage());
+            return -1;
+        }
+    }
+
+    // Delete address
+    public int deleteAddress(String addressID){
+        try{
+            // Check if the user exists
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User existingUser = userRepository.findUserByUsername(authentication.getName());
+            if (existingUser == null) {
+                log.error("User not found.");
+                return -2; // if user not exists
+            }
+
+            String sql = "DELETE FROM user_address WHERE id = ?";
+            return jdbcTemplate.update(sql, addressID);
+
+        } catch (Exception e) {
+            log.error("Error while saving new address" + e.getMessage());
             return -1;
         }
     }
@@ -133,11 +203,10 @@ public class UserService {
                 return -1;
             }
 
-            String sql = "UPDATE users SET username = ?, name = ?, email = ?, phone = ?, address = ?, roles = ? WHERE id = ?";
+            String sql = "UPDATE users SET username = ?, name = ?, email = ?, phone = ?, roles = ? WHERE id = ?";
 
             // Convert roles and addresses to JSON
             String rolesJson = objectMapper.writeValueAsString(user.getRoles());
-            String addressJson = objectMapper.writeValueAsString(user.getAddresses());
 
             // If password is being updated, encode the new password
             if (user.getPassword() != null && !user.getPassword().isEmpty()) {
@@ -151,7 +220,6 @@ public class UserService {
                     user.getName(),
                     user.getEmail(),
                     user.getPhone(),
-                    addressJson,
                     rolesJson,
                     existingUser.getId());  // Where condition
         } catch (Exception e) {

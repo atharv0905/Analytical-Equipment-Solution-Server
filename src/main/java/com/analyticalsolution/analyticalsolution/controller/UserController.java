@@ -12,6 +12,7 @@
 package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.entity.User;
+import com.analyticalsolution.analyticalsolution.entity.UserAddress;
 import com.analyticalsolution.analyticalsolution.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,75 @@ public class UserController {
         } catch (Exception e) {
             log.error("Error updating user: " + e.getMessage());
             return new ResponseEntity<>("Error updating user: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Save new address
+    @PostMapping("/save-new-address")
+    public ResponseEntity<?> saveNewAddress(@RequestBody UserAddress address) {
+        try {
+            // Call service method to update the user
+            int saveStatus = userService.saveNewAddress(address);
+
+            if (saveStatus == 1) {
+                // If update is successful, return 200 OK
+                return new ResponseEntity<>("User address successfully.", HttpStatus.OK);
+            } else if (saveStatus == -2) {
+                // If user is not found, return 404
+                return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+            } else {
+                // For other errors, return 500
+                return new ResponseEntity<>("Failed to save user address.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception e) {
+            log.error("Error saving user addres: " + e.getMessage());
+            return new ResponseEntity<>("Error saving user address: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Update address
+    @PutMapping("/update-address")
+    public ResponseEntity<?> updateAddress(@RequestBody UserAddress address) {
+        try {
+            // Call service method to update the user
+            int saveStatus = userService.updateAddress(address);
+
+            if (saveStatus == 1) {
+                // If update is successful, return 200 OK
+                return new ResponseEntity<>("User address updated successfully.", HttpStatus.OK);
+            } else if (saveStatus == -2) {
+                // If user is not found, return 404
+                return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+            } else {
+                // For other errors, return 500
+                return new ResponseEntity<>("Failed to update user address.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception e) {
+            log.error("Error saving user addres: " + e.getMessage());
+            return new ResponseEntity<>("Error updating user address: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Update address
+    @DeleteMapping("/delete-address/{addressID}")
+    public ResponseEntity<?> deleteAddress(@PathVariable String addressID) {
+        try {
+            // Call service method to update the user
+            int saveStatus = userService.deleteAddress(addressID);
+
+            if (saveStatus == 1) {
+                // If update is successful, return 200 OK
+                return new ResponseEntity<>("User address deleted successfully.", HttpStatus.OK);
+            } else if (saveStatus == -2) {
+                // If user is not found, return 404
+                return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+            } else {
+                // For other errors, return 500
+                return new ResponseEntity<>("Failed to delete user address.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception e) {
+            log.error("Error saving user addres: " + e.getMessage());
+            return new ResponseEntity<>("Error deleting user address: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
