@@ -10,7 +10,7 @@
  *              database using JdbcTemplate for smooth cart operations. It logs errors to assist
  *              in identifying issues during cart processing.
  * Created on: 14/10/2024
- * Last Modified: 14/10/2024
+ * Last Modified: 28/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.service;
@@ -22,10 +22,13 @@ import com.analyticalsolution.analyticalsolution.responses.CartDetailsResponse;
 import com.analyticalsolution.analyticalsolution.utils.UtilityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +48,11 @@ public class CartService {
     @Autowired
     private UtilityService utilityService;
 
-    private static final String BASE_URL = "http://localhost:3000/";
+    @Value("${app.base-url}")
+    private String BASE_URL;
 
     // Add item to cart
+    @Transactional
     public void addItemToCart(CartItem cartItem){
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -110,10 +115,12 @@ public class CartService {
             }
         } catch (Exception e) {
             log.error("Error occurred while adding item to cart: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
     }
 
     // Update item quantity
+    @Transactional
     public void updateItemQuantity(CartItem cartItem) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -157,10 +164,12 @@ public class CartService {
             }
         } catch (Exception e) {
             log.error("Error occurred while updating item quantity: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
     }
 
     // Delete item from cart
+    @Transactional
     public void deleteItemFromCart(String itemId) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -209,10 +218,12 @@ public class CartService {
             }
         } catch (Exception e) {
             log.error("Error occurred while deleting item from cart: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
     }
 
     // Fetch all cart items for the authenticated user
+    @Transactional
     public List<CartDetailsResponse> getAllItems() {
         List<CartDetailsResponse> cartItems = new ArrayList<>();
         try {
@@ -275,6 +286,7 @@ public class CartService {
             }
         } catch (Exception e) {
             log.error("Error occurred while fetching items from cart: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return null;
         }
 

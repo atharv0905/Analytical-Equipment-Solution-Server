@@ -8,7 +8,7 @@
  *              The service is designed to handle various exceptions gracefully, logging errors and providing
  *              meaningful responses.
  * Created on: 12/10/2024
- * Last Modified: 27/10/2024
+ * Last Modified: 28/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.service;
@@ -24,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ public class ProductService {
     private UtilityService utilityService;
 
     // Add new product
+    @Transactional
     public int addProduct(Product product, MultipartFile[] productImages) {
         try {
             String sql = "INSERT INTO products (product_id, product_name, product_desc, product_category, estimated_delivery_time, product_price, product_status, product_images) " +
@@ -76,11 +79,13 @@ public class ProductService {
                     imagesJson);
         } catch (Exception e) {
             log.error("Unexpected error adding product: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return -1;
         }
     }
 
     // Fetch all products
+    @Transactional
     public List<FetchProductsResponse> fetchAllProducts() {
         try {
             String sql = "SELECT product_id, product_name, product_desc, product_category, product_images FROM products";
@@ -88,11 +93,13 @@ public class ProductService {
             return jdbcTemplate.query(sql, new ProductsRowMapper());
         } catch (Exception e) {
             log.error("Unexpected error fetching products: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return null;
         }
     }
 
     // Fetch product by ID
+    @Transactional
     public Product fetchProductById(String productId) {
         try {
             // Select all columns from the products table where product_id matches
@@ -102,11 +109,13 @@ public class ProductService {
             return jdbcTemplate.queryForObject(sql, new Object[]{productId}, new ProductRowMapper());
         } catch (Exception e) {
             log.error("Unexpected error fetching product with ID " + productId + ": " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return null;
         }
     }
 
     // Delete product
+    @Transactional
     public int deleteProduct(String productId) {
         try {
             // Fetch the product to get image paths
@@ -127,11 +136,13 @@ public class ProductService {
             return jdbcTemplate.update(sqlDelete, productId);
         } catch (Exception e) {
             log.error("Unexpected error deleting product: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return -1;
         }
     }
 
     // Update product
+    @Transactional
     public int updateProduct(Product product, MultipartFile[] productImages) {
         try {
             // Fetch the existing product to get the old image paths
@@ -173,6 +184,7 @@ public class ProductService {
                     product.getProduct_id());
         } catch (Exception e) {
             log.error("Unexpected error updating product: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return -1;
         }
     }

@@ -16,6 +16,7 @@ package com.analyticalsolution.analyticalsolution.utils;
 import com.analyticalsolution.analyticalsolution.responses.FetchProductsResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,8 @@ import java.util.ArrayList;
 @Service
 public class ProductsRowMapper implements RowMapper<FetchProductsResponse> {
 
-    private static final String BASE_URL = "http://localhost:3000/";
+    @Value("${app.base-url}")
+    private String BASE_URL;
 
     @Override
     public FetchProductsResponse mapRow(ResultSet rs, int rowNum) throws SQLException {

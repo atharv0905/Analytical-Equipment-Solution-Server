@@ -50,3 +50,5 @@ spring:
 app:
   base-url: http://localhost:3000/
   UPLOAD_DIR: D:/AES/ProductImages/
+  sentTo: atharvmirgal09@gmail.com
+  secret-key: TaK+HaV^uvCHEFsEVfypW#7g9^k*Z8$V

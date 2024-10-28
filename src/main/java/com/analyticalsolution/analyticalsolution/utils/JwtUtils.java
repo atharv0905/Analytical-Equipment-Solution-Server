@@ -6,7 +6,7 @@
  *              extracting claims like username and expiration, and validating token integrity and expiration status.
  *              Utilizes HMAC signing for secure token management.
  * Created on: 11/10/2024
- * Last Modified: 27/10/2024
+ * Last Modified: 28/10/2024
  */
 
 
@@ -15,6 +15,7 @@ package com.analyticalsolution.analyticalsolution.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -26,7 +27,8 @@ import java.util.Map;
 public class JwtUtils {
 
     // Secret key
-    private String SECRET_KEY = "TaK+HaV^uvCHEFsEVfypW#7g9^k*Z8$V";
+    @Value("${app.secret-key}")
+    private String SECRET_KEY;
 
     private SecretKey getSigningKey(){
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());

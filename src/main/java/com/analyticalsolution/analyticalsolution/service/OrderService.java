@@ -10,7 +10,7 @@
  *              proper handling of user authentication and integrates with other services such as
  *              `CartService` to facilitate a seamless order management experience.
  * Created on: 15/10/2024
- * Last Modified: 15/10/2024
+ * Last Modified: 28/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.service;
@@ -22,10 +22,13 @@ import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
 import com.analyticalsolution.analyticalsolution.utils.UtilityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +51,11 @@ public class OrderService {
     @Autowired
     private CartService cartService;
 
-    private static final String BASE_URL = "http://localhost:3000/";
+    @Value("${app.base-url}")
+    private String BASE_URL;
 
     // Cart checkout
+    @Transactional
     public void checkout(Sale sale) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -147,10 +152,12 @@ public class OrderService {
 
         } catch (Exception e) {
             log.error("Error occurred while placing order", e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
     }
 
     // Fetch previous user orders
+    @Transactional
     public List<OrderHistoryResponse> getOrderHistoryByUser() {
         try {
             List<OrderHistoryResponse> orderHistoryList = new ArrayList<>();
@@ -212,6 +219,7 @@ public class OrderService {
             return orderHistoryList;
         } catch (Exception e) {
             log.error("Error while fetching order history", e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return null;
         }
     }

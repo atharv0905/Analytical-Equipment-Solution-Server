@@ -25,6 +25,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+
 import java.util.UUID;
 
 @Slf4j
@@ -45,6 +48,7 @@ public class UserService {
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // Create new user
+    @Transactional
     public int createUser(User user) {
         try {
             String checkEmailVerificationSql = "SELECT COUNT(*) FROM email_verification WHERE email = ?";
@@ -89,11 +93,13 @@ public class UserService {
                     rolesJson);
         } catch (Exception e) {
             log.error("Unexpected error creating user: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return -1;
         }
     }
 
     // Save user address
+    @Transactional
     public int saveNewAddress(UserAddress address){
         try{
             // Check if the user exists
@@ -115,11 +121,13 @@ public class UserService {
 
         } catch (Exception e) {
             log.error("Error while saving new address" + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return -1;
         }
     }
 
     // Update saved address
+    @Transactional
     public int updateAddress(UserAddress address){
         try{
             // Check if the user exists
@@ -140,11 +148,13 @@ public class UserService {
 
         } catch (Exception e) {
             log.error("Error while updating address" + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return -1;
         }
     }
 
     // Delete address
+    @Transactional
     public int deleteAddress(String addressID){
         try{
             // Check if the user exists
@@ -160,11 +170,13 @@ public class UserService {
 
         } catch (Exception e) {
             log.error("Error while saving new address" + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return -1;
         }
     }
 
     // Reset password
+    @Transactional
     public int resetPassword(String password){
         try{
             // Check if the user exists
@@ -188,11 +200,13 @@ public class UserService {
 
         } catch (Exception e) {
             log.error("Unexpected error resetting password: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return -1;
         }
     }
 
     // Update existing user
+    @Transactional
     public int updateUser(User user) {
         try {
             // Check if the user exists
@@ -224,11 +238,13 @@ public class UserService {
                     existingUser.getId());  // Where condition
         } catch (Exception e) {
             log.error("Unexpected error updating user: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return -1;
         }
     }
 
     // Delete user
+    @Transactional
     public void deleteUser(){
         try{
             // Check if the user exists
@@ -242,6 +258,7 @@ public class UserService {
             jdbcTemplate.update(sql, existingUser.getId());
         } catch (Exception e) {
             log.error("Error deleting user: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
     }
 

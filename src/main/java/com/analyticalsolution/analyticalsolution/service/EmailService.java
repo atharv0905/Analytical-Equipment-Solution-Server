@@ -6,7 +6,7 @@
  *              draft emails with encoded subjects and bodies. Verification tokens are generated using JWT and stored in the database
  *              for validation purposes. The service interacts with the database to ensure email uniqueness and to track email verification status.
  * Created on: 13/10/2024
- * Last Modified: 27/10/2024
+ * Last Modified: 28/10/2024
  */
 
 
@@ -18,6 +18,7 @@ import com.analyticalsolution.analyticalsolution.requests.EmailVerificationReque
 import com.analyticalsolution.analyticalsolution.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -27,6 +28,8 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.util.UriUtils;
 
 import java.nio.charset.StandardCharsets;
@@ -47,10 +50,14 @@ public class EmailService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private static final String BASE_URL = "http://localhost:3000/";
+    @Value("${app.base-url}")
+    private String BASE_URL;
 
-    private static final String sentTo = "atharvmirgal09@gmail.com";
+    @Value("${app.sentTo}")
+    private String sentTo;
 
+    // Send contact email
+    @Transactional
     public String sendDraftMail(String subject, String body){
         System.out.println("mail request hit");
         try{
@@ -65,10 +72,13 @@ public class EmailService {
             );
         } catch (Exception e) {
             log.error("Error while sending mail: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return null;
         }
     }
 
+    // Send verification mail
+    @Transactional
     public void sendVerificationMail(String email){
         try {
             System.out.println(email);
@@ -110,9 +120,12 @@ public class EmailService {
             javaMailSender.send(messagePreparator);
         } catch (Exception e) {
             log.error("Exception while sending email: " + e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
     }
 
+    // Verify email
+    @Transactional
     public Boolean verifyEmail(EmailVerificationRequest emailVerificationRequest){
         try {
             Boolean isValid = jwtUtils.validateToken(emailVerificationRequest.getToken());
@@ -124,10 +137,13 @@ public class EmailService {
             }
             return true;
         } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return false;
         }
     }
 
+    // Send password reset mail
+    @Transactional
     public Boolean sendPasswordResetMail(String email) {
         try {
             System.out.println(email);
@@ -166,6 +182,7 @@ public class EmailService {
             return false;
         } catch (Exception e) {
             log.error("Exception while sending email: " + e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return false;
         }
     }
