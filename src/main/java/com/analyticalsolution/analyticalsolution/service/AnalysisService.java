@@ -14,15 +14,18 @@
 package com.analyticalsolution.analyticalsolution.service;
 
 import com.analyticalsolution.analyticalsolution.entity.Product;
-import com.analyticalsolution.analyticalsolution.responses.DateRange;
-import com.analyticalsolution.analyticalsolution.responses.ProductSummaryResponse;
-import com.analyticalsolution.analyticalsolution.responses.RevenueProfitResponse;
-import com.analyticalsolution.analyticalsolution.responses.TopSellerResponse;
+import com.analyticalsolution.analyticalsolution.responses.*;
 import com.analyticalsolution.analyticalsolution.utils.AnalysisUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,11 @@ public class AnalysisService {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    private String BASE_URL = "http://localhost:3000/";
 
     // Calculates the monthly revenue and profit
     public List<RevenueProfitResponse> calculateMonthlyRevenueAndProfit() {
@@ -77,6 +85,7 @@ public class AnalysisService {
         return revenueProfitResponses;
     }
 
+    // Get top sellers
     public List<TopSellerResponse> getTopSellers() {
         // Create a map to accumulate total quantities for each product
         Map<String, Long> productQuantityMap = new HashMap<>();
@@ -112,6 +121,27 @@ public class AnalysisService {
                 .collect(Collectors.toList());
 
         return sortedTopSellers;
+    }
+
+    // Get new arrivals
+    public List<FetchProductsResponse> listAllProductsOrderedByCreation() {
+        List<FetchProductsResponse> productList = new ArrayList<>();
+        String sql = "SELECT * FROM products ORDER BY created_at DESC";
+
+        return jdbcTemplate.query(sql, new RowMapper<FetchProductsResponse>() {
+            @Override
+            public FetchProductsResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
+                FetchProductsResponse product = new FetchProductsResponse();
+                product.setProduct_id(rs.getString("product_id"));
+                product.setProduct_name(rs.getString("product_name"));
+                String productImagesJson = rs.getString("product_images");
+                JSONArray jsonArray = new JSONArray(productImagesJson);
+                String firstImageUrl = jsonArray.length() > 0 ? jsonArray.getString(0) : null;
+                firstImageUrl = BASE_URL + firstImageUrl;
+                product.setProduct_image(firstImageUrl);
+                return product;
+            }
+        });
     }
 
 }

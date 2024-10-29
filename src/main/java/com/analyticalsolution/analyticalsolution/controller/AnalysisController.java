@@ -13,6 +13,7 @@
 
 package com.analyticalsolution.analyticalsolution.controller;
 
+import com.analyticalsolution.analyticalsolution.responses.FetchProductsResponse;
 import com.analyticalsolution.analyticalsolution.responses.RevenueProfitResponse;
 import com.analyticalsolution.analyticalsolution.responses.TopSellerResponse;
 import com.analyticalsolution.analyticalsolution.service.AnalysisService;
@@ -43,6 +44,7 @@ public class AnalysisController {
         }
     }
 
+    // Get top sellers
     @GetMapping("/top-sellers")
     public ResponseEntity<?> getTopSellers(){
         try{
@@ -56,4 +58,20 @@ public class AnalysisController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // Get new arrivals
+    @GetMapping("/new-arrivals")
+    public ResponseEntity<?> getNewArrivals(){
+        try{
+            List<FetchProductsResponse> fetchProductsResponses = analysisService.listAllProductsOrderedByCreation();
+
+            List<FetchProductsResponse> newArrivals = fetchProductsResponses.stream()
+                    .limit(5)
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(newArrivals, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
