@@ -18,7 +18,9 @@ package com.analyticalsolution.analyticalsolution.service;
 import com.analyticalsolution.analyticalsolution.entity.Sale;
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
+import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
 import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
+import com.analyticalsolution.analyticalsolution.responses.ProductInvoiceResponse;
 import com.analyticalsolution.analyticalsolution.utils.UtilityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -210,6 +209,95 @@ public class OrderService {
         } catch (Exception e) {
             log.error("Error while fetching order history", e);
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return null;
+        }
+    }
+
+    public InvoiceResponse generateInvoice(String saleID) {
+        try {
+            InvoiceResponse invoiceResponse = new InvoiceResponse();
+
+            // Fetch the basic sale details (sale_id and order_date)
+            String fetchSale = "SELECT order_date FROM sales WHERE sale_id = ?";
+            Date orderDate = jdbcTemplate.queryForObject(fetchSale, new Object[]{saleID}, Date.class);
+
+            invoiceResponse.setSale_id(saleID);
+            invoiceResponse.setOrder_date(orderDate);
+
+            // Fetch sale and product details
+            String saleDetails = "SELECT " +
+                    "    s.sale_id, " +
+                    "    u.name AS customer_name, " +
+                    "    u.email AS customer_email, " +
+                    "    s.contact_phone AS customer_phone, " +
+                    "    s.shipping_address AS shipping_address, " +
+                    "    o.product_id, " +
+                    "    p.product_name, " +
+                    "    p.product_price, " +
+                    "    o.quantity, " +
+                    "    (p.product_price * o.quantity) AS order_total " +
+                    "FROM sales s " +
+                    "JOIN orders o ON s.sale_id = o.sale_id " +
+                    "JOIN users u ON s.customer_id = u.id " +
+                    "JOIN products p ON o.product_id = p.product_id " +
+                    "WHERE s.sale_id = ?";
+
+            // Mapping the fetched data to the InvoiceResponse and ProductInvoiceResponse
+            List<ProductInvoiceResponse> products = jdbcTemplate.query(saleDetails, new Object[]{saleID}, (rs, rowNum) -> {
+                ProductInvoiceResponse product = new ProductInvoiceResponse();
+                product.setProduct_name(rs.getString("product_name"));
+                product.setQuantity(rs.getLong("quantity"));
+                product.setProduct_price(rs.getLong("product_price"));
+                product.setTotal_price(rs.getLong("order_total"));
+                return product;
+            });
+
+            List<InvoiceResponse> invoiceResponses = jdbcTemplate.query(saleDetails, new Object[]{saleID}, (rs, rowNum) -> {
+                InvoiceResponse user = new InvoiceResponse();
+                user.setCustomer_email(rs.getString("customer_email"));
+                user.setCustomer_name(rs.getString("customer_name"));
+                user.setCustomer_phone(rs.getLong("customer_phone"));
+                user.setShipping_address(rs.getString("shipping_address"));
+                return user;
+            });
+
+            invoiceResponse.setCustomer_name(invoiceResponses.get(0).getCustomer_name());
+            invoiceResponse.setCustomer_email(invoiceResponses.get(0).getCustomer_email());
+            invoiceResponse.setCustomer_phone(invoiceResponses.get(0).getCustomer_phone());
+            invoiceResponse.setShipping_address(invoiceResponses.get(0).getShipping_address());
+
+            String company_name = "Analytical Equipment Solutions";
+            invoiceResponse.setCompany_name(company_name);
+
+            String company_address = " Jamil Nagar, Bhandup (W), Mumbai - 400078";
+            invoiceResponse.setCompany_address(company_address);
+
+            String company_email = "official@analyticalequipmentsolutions.com";
+            invoiceResponse.setCompany_email(company_email);
+
+            String company_phone = "8268393857";
+            invoiceResponse.setCompany_phone(company_phone);
+
+            invoiceResponse.setProducts(products);
+
+            // Calculate subtotal by summing all product total prices
+            long subtotal = products.stream().mapToLong(ProductInvoiceResponse::getTotal_price).sum();
+
+            // Calculate gst_cost as 18% of subtotal
+            long gst_cost = Math.round(subtotal * 0.18);
+            invoiceResponse.setGst_cost(gst_cost);
+
+            // Set shipping cost
+            long shipping_cost = 3000L;
+            invoiceResponse.setShipping_cost(shipping_cost);
+
+            // Calculate total cost
+            long total_cost = subtotal + gst_cost + shipping_cost;
+            invoiceResponse.setTotal_cost(total_cost);
+
+            return invoiceResponse;
+        } catch (Exception e) {
+            log.error("Error fetching data for generating invoice: " + e.getMessage());
             return null;
         }
     }

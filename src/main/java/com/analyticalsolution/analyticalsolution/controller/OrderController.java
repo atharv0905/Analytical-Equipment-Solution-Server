@@ -15,6 +15,7 @@
 package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.entity.Sale;
+import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
 import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
 import com.analyticalsolution.analyticalsolution.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,17 @@ public class OrderController {
             return new ResponseEntity<>(orderHistoryByUser, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error occured while fetching order history", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Get invoice details
+    @PostMapping("/generate-invoice")
+    public ResponseEntity<?> generateInvoice(@RequestParam String saleID){
+        try{
+            InvoiceResponse invoiceResponse = orderService.generateInvoice(saleID);
+            return new ResponseEntity<>(invoiceResponse, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

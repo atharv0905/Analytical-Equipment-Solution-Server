@@ -111,7 +111,7 @@ public class AnalysisService {
                     String productImage = (product != null && product.getProduct_images() != null && !product.getProduct_images().isEmpty())
                             ? product.getProduct_images().get(0) : ""; // Get the first image if available
 
-                    return new TopSellerResponse(entry.getKey(), productImage, entry.getValue()); // Use Long directly
+                    return new TopSellerResponse(entry.getKey(), productImage, product.getProduct_name(), entry.getValue()); // Use Long directly
                 })
                 .collect(Collectors.toList());
 
