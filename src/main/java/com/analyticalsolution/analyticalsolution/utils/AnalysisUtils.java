@@ -38,8 +38,8 @@ public class AnalysisUtils {
     }
 
     // Get all the orders months wise
-    public List<OrderFetchResponse> getOrders() {
-        List<Order> allOrders = orderRepository.findAll();
+    public List<OrderFetchResponse> getOrders(String tableName) {
+        List<Order> allOrders = orderRepository.findAll(tableName);
 
         // Group orders by year and month
         Map<String, List<Order>> groupedOrders = allOrders.stream()
@@ -82,9 +82,9 @@ public class AnalysisUtils {
     }
 
     // Get summary of units sold of each product month wise
-    public List<Map<DateRange, List<ProductSummaryResponse>>> getMonthlyProductSummaries() {
+    public List<Map<DateRange, List<ProductSummaryResponse>>> getMonthlyProductSummaries(String tableName) {
         List<Map<DateRange, List<ProductSummaryResponse>>> monthlyProductSummaries = new ArrayList<>();
-        List<OrderFetchResponse> monthlyOrders = getOrders();
+        List<OrderFetchResponse> monthlyOrders = getOrders(tableName);
         for (OrderFetchResponse monthlyOrder : monthlyOrders) {
             // Group by product_id and sum quantities for each product
             Map<String, Long> productQuantityMap = monthlyOrder.getOrderList().stream()

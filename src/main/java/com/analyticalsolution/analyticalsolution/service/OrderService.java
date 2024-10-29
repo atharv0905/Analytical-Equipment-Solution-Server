@@ -10,7 +10,7 @@
  *              proper handling of user authentication and integrates with other services such as
  *              `CartService` to facilitate a seamless order management experience.
  * Created on: 15/10/2024
- * Last Modified: 28/10/2024
+ * Last Modified: 29/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.service;
@@ -82,41 +82,14 @@ public class OrderService {
                 // Convert JSON string to a list of item IDs
                 List<String> itemIds = utilityService.parseJsonToList(itemIdsJson);
 
-                // Prepare to store order IDs
-                List<String> orderIds = new ArrayList<>();
-                String createOrderSql = "INSERT INTO orders (order_id, product_id, quantity) VALUES (?, ?, ?)";
-
-                for (String itemId : itemIds) {
-                    // Retrieve product_id and quantity for each item_id from cartitems table
-                    String selectProductSql = "SELECT product_id, quantity FROM cartitems WHERE item_id = ?";
-                    Map<String, Object> cartItemData = jdbcTemplate.queryForMap(selectProductSql, itemId);
-
-                    String productId = (String) cartItemData.get("product_id");
-                    long quantity = (long) cartItemData.get("quantity");
-
-                    // Generate a unique order_id
-                    String orderId = UUID.randomUUID().toString();
-
-                    // Create a new entry in the orders table
-                    jdbcTemplate.update(createOrderSql, orderId, productId, quantity);
-
-                    // Add the generated orderId to the list
-                    orderIds.add(orderId);
-
-                    // Delete item from cart
-                    cartService.deleteItemFromCart(itemId);
-                }
-
-                // Create a new Sale entry in the sales table
-                String createSaleSql = "INSERT INTO sales (sale_id, customer_id, order_ids, order_confirmation_status, " +
-                        "order_status, shipping_address, contact_phone, transaction_id, payment_status, invoice_number, sale_mode) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
                 // Generate a unique sale_id, transaction_id, and invoice_number
                 String saleId = UUID.randomUUID().toString();
+                String createOrderSql = "INSERT INTO orders (order_id, sale_id, product_id, quantity) VALUES (?, ?, ?, ?)";
 
-                // Convert order IDs list to JSON string
-                String orderIdsJson = utilityService.convertListToJson(orderIds);
+                // Create a new Sale entry in the sales table
+                String createSaleSql = "INSERT INTO sales (sale_id, customer_id, order_confirmation_status, " +
+                        "order_status, shipping_address, contact_phone, transaction_id, payment_status, invoice_number, sale_mode) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 // Default values for order status and sales mode
                 String defaultOrderConfirmationStatus = "PENDING";
@@ -134,7 +107,6 @@ public class OrderService {
                 jdbcTemplate.update(createSaleSql,
                         saleId,
                         customerID,
-                        orderIdsJson,
                         orderConfirmationStatus,
                         orderStatus,
                         sale.getShipping_address(),
@@ -144,6 +116,24 @@ public class OrderService {
                         sale.getInvoice_number(),
                         saleMode
                 );
+
+                for (String itemId : itemIds) {
+                    // Retrieve product_id and quantity for each item_id from cartitems table
+                    String selectProductSql = "SELECT product_id, quantity FROM cartitems WHERE item_id = ?";
+                    Map<String, Object> cartItemData = jdbcTemplate.queryForMap(selectProductSql, itemId);
+
+                    String productId = (String) cartItemData.get("product_id");
+                    long quantity = (long) cartItemData.get("quantity");
+
+                    // Generate a unique order_id
+                    String orderId = UUID.randomUUID().toString();
+
+                    // Create a new entry in the orders table
+                    jdbcTemplate.update(createOrderSql, orderId, saleId, productId, quantity);
+
+                    // Delete item from cart
+                    cartService.deleteItemFromCart(itemId);
+                }
 
                 log.info("Order and Sale successfully created for user: " + existingUser.getUsername());
             } else {

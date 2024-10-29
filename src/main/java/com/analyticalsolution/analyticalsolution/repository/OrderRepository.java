@@ -31,8 +31,8 @@ public class OrderRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<Order> findAll(){
-        String sql = "SELECT * FROM orders";
+    public List<Order> findAll(String tableName){
+        String sql = "SELECT * FROM " + tableName;
         return jdbcTemplate.query(sql, this::mapRowToOrder);
     }
 
@@ -44,6 +44,7 @@ public class OrderRepository {
     private Order mapRowToOrder(ResultSet rs, int rowNum) throws SQLException {
         return new Order(
                 rs.getString("order_id"),
+                rs.getString("sale_id"),
                 rs.getString("product_id"),
                 rs.getLong("quantity"),
                 rs.getDate("order_date")

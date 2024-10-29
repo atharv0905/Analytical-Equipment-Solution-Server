@@ -14,6 +14,7 @@
 package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.responses.FetchProductsResponse;
+import com.analyticalsolution.analyticalsolution.responses.OnlineOfflineSalesResponse;
 import com.analyticalsolution.analyticalsolution.responses.RevenueProfitResponse;
 import com.analyticalsolution.analyticalsolution.responses.TopSellerResponse;
 import com.analyticalsolution.analyticalsolution.service.AnalysisService;
@@ -37,7 +38,8 @@ public class AnalysisController {
     @GetMapping("/monthly-sales")
     public ResponseEntity<?> getMonthlyRevenueProfit(){
         try{
-            List<RevenueProfitResponse> revenueProfitResponses = analysisService.calculateMonthlyRevenueAndProfit();
+            String tableName = "orders";
+            List<RevenueProfitResponse> revenueProfitResponses = analysisService.calculateMonthlyRevenueAndProfit(tableName);
             return new ResponseEntity<>(revenueProfitResponses, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -69,6 +71,21 @@ public class AnalysisController {
                     .limit(5)
                     .collect(Collectors.toList());
             return new ResponseEntity<>(newArrivals, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/online-offline-sales")
+    public ResponseEntity<?> getOnlineOfflineSales(){
+        try{
+            String offlineSales = "offline_order_summary";
+            String onlineSales = "online_order_summary";
+            List<RevenueProfitResponse> offlineRevenueProfit = analysisService.calculateMonthlyRevenueAndProfit(offlineSales);
+            List<RevenueProfitResponse> onlineRevenueProfit = analysisService.calculateMonthlyRevenueAndProfit(onlineSales);
+
+            OnlineOfflineSalesResponse revenueProfitResponses = new OnlineOfflineSalesResponse(offlineRevenueProfit, onlineRevenueProfit);
+            return new ResponseEntity<>(revenueProfitResponses, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

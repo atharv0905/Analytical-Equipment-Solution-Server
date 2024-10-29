@@ -46,9 +46,9 @@ public class AnalysisService {
     private String BASE_URL = "http://localhost:3000/";
 
     // Calculates the monthly revenue and profit
-    public List<RevenueProfitResponse> calculateMonthlyRevenueAndProfit() {
+    public List<RevenueProfitResponse> calculateMonthlyRevenueAndProfit(String tableName) {
         List<RevenueProfitResponse> revenueProfitResponses = new ArrayList<>();
-        List<Map<DateRange, List<ProductSummaryResponse>>> monthlyProductSummaries = analysisUtils.getMonthlyProductSummaries();
+        List<Map<DateRange, List<ProductSummaryResponse>>> monthlyProductSummaries = analysisUtils.getMonthlyProductSummaries(tableName);
         for (Map<DateRange, List<ProductSummaryResponse>> monthlySummary : monthlyProductSummaries) {
             for (Map.Entry<DateRange, List<ProductSummaryResponse>> entry : monthlySummary.entrySet()) {
                 DateRange dateRange = entry.getKey();
@@ -89,7 +89,8 @@ public class AnalysisService {
     public List<TopSellerResponse> getTopSellers() {
         // Create a map to accumulate total quantities for each product
         Map<String, Long> productQuantityMap = new HashMap<>();
-        List<Map<DateRange, List<ProductSummaryResponse>>> monthlyProductSummaries = analysisUtils.getMonthlyProductSummaries();
+        String tableName = "orders";
+        List<Map<DateRange, List<ProductSummaryResponse>>> monthlyProductSummaries = analysisUtils.getMonthlyProductSummaries(tableName);
 
         // Accumulate quantities for each product across all months
         for (Map<DateRange, List<ProductSummaryResponse>> monthlySummary : monthlyProductSummaries) {
@@ -109,7 +110,6 @@ public class AnalysisService {
                     Product product = productService.fetchProductById(entry.getKey());
                     String productImage = (product != null && product.getProduct_images() != null && !product.getProduct_images().isEmpty())
                             ? product.getProduct_images().get(0) : ""; // Get the first image if available
-                    System.out.println(productImage);
 
                     return new TopSellerResponse(entry.getKey(), productImage, entry.getValue()); // Use Long directly
                 })
