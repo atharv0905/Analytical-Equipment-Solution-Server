@@ -164,7 +164,7 @@ public class EmailService {
                     // Define HTML content for the email body
                     String body = "<h1>Reset Password</h1>" +
                             "<p>Please click the link below to reset your account password:</p>" +
-                            "<a href='" + "http://localhost:5501/user/view/email-verify.html?token=" + token + "' style='display: inline-block; padding: 10px 20px; " +
+                            "<a href='" + "http://localhost:5501/user/view/reset-password.html?token=" + token + "' style='display: inline-block; padding: 10px 20px; " +
                             "background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px;'>Reset Password</a>";
 
                     messageHelper.setText(body, true); // Set to 'true' for HTML content

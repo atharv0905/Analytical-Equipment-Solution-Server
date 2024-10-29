@@ -6,7 +6,7 @@
  *              constructors, and more. The class is designed for use with a database, using the `@Id` annotation
  *              for the primary key.
  * Created on: 15/10/2024
- * Last Modified: 15/10/2024
+ * Last Modified: 28/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.entity;
@@ -16,6 +16,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.data.annotation.Id;
+
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -31,4 +33,6 @@ public class Order {
 
     @NonNull
     private long quantity;
+
+    private Date orderDate;
 }

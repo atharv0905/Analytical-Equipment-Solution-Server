@@ -46,8 +46,8 @@ public class ProductService {
     @Transactional
     public int addProduct(Product product, MultipartFile[] productImages) {
         try {
-            String sql = "INSERT INTO products (product_id, product_name, product_desc, product_category, estimated_delivery_time, product_price, product_status, product_images) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO products (product_id, product_name, product_desc, product_category, estimated_delivery_time, product_price, product_profit, product_status, product_images) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             // Generate a unique ID for the product
             product.setProduct_id(UUID.randomUUID().toString());
@@ -75,6 +75,7 @@ public class ProductService {
                     product.getProduct_category(),
                     product.getEstimated_delivery_time(),
                     product.getProduct_price(),
+                    product.getProduct_profit(),
                     defaultProductStatus,
                     imagesJson);
         } catch (Exception e) {
@@ -103,7 +104,7 @@ public class ProductService {
     public Product fetchProductById(String productId) {
         try {
             // Select all columns from the products table where product_id matches
-            String sql = "SELECT product_id, product_name, product_desc, product_category, estimated_delivery_time, product_price, product_images FROM products WHERE product_id = ?";
+            String sql = "SELECT product_id, product_name, product_desc, product_category, estimated_delivery_time, product_price, product_profit, product_images FROM products WHERE product_id = ?";
 
             // Use queryForObject to get a single product's details
             return jdbcTemplate.queryForObject(sql, new Object[]{productId}, new ProductRowMapper());
@@ -172,13 +173,14 @@ public class ProductService {
             String imagesJsonNew = new ObjectMapper().writeValueAsString(imagePaths);
 
             // Update the database with the new product information
-            String sqlUpdate = "UPDATE products SET product_name = ?, product_desc = ?, product_category = ?, estimated_delivery_time = ?, product_price = ?, product_status = ?, product_images = ? WHERE product_id = ?";
+            String sqlUpdate = "UPDATE products SET product_name = ?, product_desc = ?, product_category = ?, estimated_delivery_time = ?, product_price = ?, product_profit = ?, product_status = ?, product_images = ? WHERE product_id = ?";
             return jdbcTemplate.update(sqlUpdate,
                     product.getProduct_name(),
                     product.getProduct_desc(),
                     product.getProduct_category(),
                     product.getEstimated_delivery_time(),
                     product.getProduct_price(),
+                    product.getProduct_profit(),
                     product.getProduct_status(),
                     imagesJsonNew,
                     product.getProduct_id());

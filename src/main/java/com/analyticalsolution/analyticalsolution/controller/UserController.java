@@ -5,7 +5,7 @@
  *              resetting passwords, and deleting accounts, with response handling to communicate operation status.
  *              Interacts with UserService for secure, efficient handling of user data and logs errors for troubleshooting.
  * Created on: 11/10/2024
- * Last Modified: 27/10/2024
+ * Last Modified: 28/10/2024
  */
 
 
@@ -13,11 +13,14 @@ package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.entity.UserAddress;
+import com.analyticalsolution.analyticalsolution.repository.UserRepository;
 import com.analyticalsolution.analyticalsolution.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -27,6 +30,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     // Update user details
     @PutMapping("/updateUser")
@@ -155,6 +161,20 @@ public class UserController {
         } catch (Exception e) {
             log.error("Error updating user: " + e.getMessage());
             return new ResponseEntity<>("Error resetting password: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Get user details
+    @GetMapping("/getUser")
+    public ResponseEntity<?> getUserByUID(){
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User existingUser = userRepository.findUserByUsername(authentication.getName());
+            User user = userRepository.findUserById(existingUser.getId());
+            return new ResponseEntity<>(user, HttpStatus.OK);
+
+        }catch (Exception e){
+            return new ResponseEntity<>("Error fetching using details", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

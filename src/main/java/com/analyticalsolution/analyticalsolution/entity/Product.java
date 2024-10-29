@@ -7,7 +7,7 @@
  *              The class is designed for use with a MongoDB database, using the `@Id` annotation
  *              for the primary key.
  * Created on: 12/10/2024
- * Last Modified: 27/10/2024
+ * Last Modified: 28/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.entity;
@@ -43,6 +43,9 @@ public class Product {
 
     @NonNull
     private Long product_price;
+
+    @NonNull
+    private Long product_profit;
 
     @NonNull
     private Integer product_status;

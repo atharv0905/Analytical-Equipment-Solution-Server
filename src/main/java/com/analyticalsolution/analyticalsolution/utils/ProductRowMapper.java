@@ -7,7 +7,7 @@
  *              class appends a base URL to each image path for serving the images correctly. This helps in
  *              transforming the data stored in the database into a usable format for the application.
  * Created on: 13/10/2024
- * Last Modified: 13/10/2024
+ * Last Modified: 28/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.utils;
@@ -38,6 +38,7 @@ public class ProductRowMapper implements RowMapper<Product> {
         product.setProduct_category(rs.getString("product_category"));
         product.setEstimated_delivery_time(rs.getString("estimated_delivery_time"));
         product.setProduct_price(rs.getLong("product_price"));
+        product.setProduct_profit(rs.getLong("product_profit"));
 
         // Convert JSON string to List<String>
         String imagesJson = rs.getString("product_images");
