@@ -13,10 +13,7 @@
 
 package com.analyticalsolution.analyticalsolution.controller;
 
-import com.analyticalsolution.analyticalsolution.responses.FetchProductsResponse;
-import com.analyticalsolution.analyticalsolution.responses.OnlineOfflineSalesResponse;
-import com.analyticalsolution.analyticalsolution.responses.RevenueProfitResponse;
-import com.analyticalsolution.analyticalsolution.responses.TopSellerResponse;
+import com.analyticalsolution.analyticalsolution.responses.*;
 import com.analyticalsolution.analyticalsolution.service.AnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -87,6 +84,17 @@ public class AnalysisController {
 
             OnlineOfflineSalesResponse revenueProfitResponses = new OnlineOfflineSalesResponse(offlineRevenueProfit, onlineRevenueProfit);
             return new ResponseEntity<>(revenueProfitResponses, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    // Fetching pending and completed order count
+    @GetMapping("/pending-complete-order-count")
+    public ResponseEntity<?> getPendingCompletedOrderCount(){
+        try {
+            OrderStatusResponse pendingCompletedOrderCount = analysisService.getPendingCompletedOrderCount();
+            return new ResponseEntity<>(pendingCompletedOrderCount, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

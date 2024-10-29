@@ -144,4 +144,25 @@ public class AnalysisService {
         });
     }
 
+    // Get pending/completed order count
+    public OrderStatusResponse getPendingCompletedOrderCount(){
+        OrderStatusResponse response = new OrderStatusResponse();
+        try {
+            // Query for pending orders
+            String pendingSql = "SELECT COUNT(*) AS pending_order_count FROM sales WHERE order_status = 'PENDING'";
+            Long pendingCount = jdbcTemplate.queryForObject(pendingSql, Long.class);
+            response.setPending(pendingCount);
+
+            // Query for completed orders
+            String completedSql = "SELECT COUNT(*) AS completed_order_count FROM sales WHERE order_status = 'COMPLETED'";
+            Long completedCount = jdbcTemplate.queryForObject(completedSql, Long.class);
+
+            response.setCompleted(completedCount);
+            return response;
+        } catch (Exception e) {
+            log.error("Error fetching count: " + e.getMessage());
+            return null;
+        }
+    }
+
 }
