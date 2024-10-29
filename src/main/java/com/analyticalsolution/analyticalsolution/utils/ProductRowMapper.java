@@ -26,8 +26,8 @@ import java.util.ArrayList;
 @Service
 public class ProductRowMapper implements RowMapper<Product> {
 
-    @Value("${app.base-url}")
-    private String BASE_URL;
+    @Value("${app.BASE_URL}")
+    private String BASE_URL = "http://localhost:3000/";
 
     @Override
     public Product mapRow(ResultSet rs, int rowNum) throws SQLException {

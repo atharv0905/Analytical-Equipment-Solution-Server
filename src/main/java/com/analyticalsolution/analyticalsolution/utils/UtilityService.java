@@ -37,11 +37,11 @@ public class UtilityService {
     private UserRepository userRepository;
 
     @Value("${app.base-url}")
-    private String BASE_URL;
+    private String BASE_URL = "http://localhost:3000/";
 
     // Directory to save uploaded images
-    @Value("${app.UPLOAD_DIR}")
-    private String UPLOAD_DIR;
+//    @Value("${app.UPLOAD_DIR}")
+    private String UPLOAD_DIR = "D:/AES/ProductImages/";
 
     // Method to save the profile image to server and return the file path
     public String saveProductImage(MultipartFile file, String username) {

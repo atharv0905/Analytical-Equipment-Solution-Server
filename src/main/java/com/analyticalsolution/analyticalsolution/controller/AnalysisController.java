@@ -14,6 +14,7 @@
 package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.responses.RevenueProfitResponse;
+import com.analyticalsolution.analyticalsolution.responses.TopSellerResponse;
 import com.analyticalsolution.analyticalsolution.service.AnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -36,6 +38,20 @@ public class AnalysisController {
         try{
             List<RevenueProfitResponse> revenueProfitResponses = analysisService.calculateMonthlyRevenueAndProfit();
             return new ResponseEntity<>(revenueProfitResponses, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/top-sellers")
+    public ResponseEntity<?> getTopSellers(){
+        try{
+            List<TopSellerResponse> topSellers = analysisService.getTopSellers();
+
+            List<TopSellerResponse> limitedTopSellers = topSellers.stream()
+                    .limit(5)
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(limitedTopSellers, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

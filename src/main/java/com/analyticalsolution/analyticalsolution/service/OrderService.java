@@ -51,8 +51,8 @@ public class OrderService {
     @Autowired
     private CartService cartService;
 
-    @Value("${app.base-url}")
-    private String BASE_URL;
+//    @Value("${app.base-url}")
+    private String BASE_URL = "http://localhost:3000/";
 
     // Cart checkout
     @Transactional

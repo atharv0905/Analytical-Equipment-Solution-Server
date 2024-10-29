@@ -50,11 +50,11 @@ public class EmailService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Value("${app.base-url}")
-    private String BASE_URL;
+//    @Value("${app.base-url}")
+    private String BASE_URL = "http://localhost:3000/";
 
-    @Value("${app.sentTo}")
-    private String sentTo;
+//    @Value("${app.sentTo}")
+    private String sentTo = "atharvmirgal09@gmail.com";
 
     // Send contact email
     @Transactional

@@ -67,6 +67,7 @@ public class ProductService {
             // Convert image paths list to JSON string for database storage
             String imagesJson = new ObjectMapper().writeValueAsString(imagePaths);
             Boolean defaultProductStatus = true;
+
             // Update the database with the product information
             return jdbcTemplate.update(sql,
                     product.getProduct_id(),
