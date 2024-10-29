@@ -32,9 +32,6 @@ public class Sale {
     private String customer_id;
 
     @NonNull
-    private List<String> order_ids = new ArrayList<>();
-
-    @NonNull
     private String order_confirmation_status;
 
     @NonNull

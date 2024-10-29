@@ -24,6 +24,9 @@ import java.util.Date;
 @NoArgsConstructor
 public class Order {
 
+    @NonNull
+    private String sale_id;
+
     @Id
     @NonNull
     private String order_id;
