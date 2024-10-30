@@ -50,7 +50,7 @@ public class Sale {
     private String payment_status;
 
     @NonNull
-    private String invoice_number;
+    private String order_id;
 
     @NonNull
     private String sale_mode;

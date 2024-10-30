@@ -87,7 +87,7 @@ public class OrderService {
 
                 // Create a new Sale entry in the sales table
                 String createSaleSql = "INSERT INTO sales (sale_id, customer_id, order_confirmation_status, " +
-                        "order_status, shipping_address, contact_phone, transaction_id, payment_status, invoice_number, sale_mode) " +
+                        "order_status, shipping_address, contact_phone, transaction_id, payment_status, order_id, sale_mode) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 // Default values for order status and sales mode
@@ -112,7 +112,7 @@ public class OrderService {
                         sale.getContact_phone(),
                         sale.getTransaction_id(),
                         paymentStatus,
-                        sale.getInvoice_number(),
+                        sale.getOrder_id(),
                         saleMode
                 );
 
