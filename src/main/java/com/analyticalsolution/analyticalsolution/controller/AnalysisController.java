@@ -58,6 +58,17 @@ public class AnalysisController {
         }
     }
 
+    // Get top sellers
+    @GetMapping("/dash/top-sellers")
+    public ResponseEntity<?> getTopSellersForDash(){
+        try{
+            List<TopSellerResponse> topSellers = analysisService.getTopSellers();
+            return new ResponseEntity<>(topSellers, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Get new arrivals
     @GetMapping("/new-arrivals")
     public ResponseEntity<?> getNewArrivals(){
