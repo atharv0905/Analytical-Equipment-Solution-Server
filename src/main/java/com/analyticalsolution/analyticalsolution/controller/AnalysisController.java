@@ -112,9 +112,20 @@ public class AnalysisController {
         }
     }
 
+    // Handle page reach
+    @GetMapping("/hit")
+    public ResponseEntity<?> getHit(){
+        try{
+            analysisService.countPageReach();
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Scheduled(cron = "0 0/1 * 1/1 * ?")
-    public void Test(){
-        System.out.println("Hello testing schedular");
+    public void savePageReachOnInterval(){
+        analysisService.updatePageReach();
     }
 
 }

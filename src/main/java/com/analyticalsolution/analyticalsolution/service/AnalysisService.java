@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,6 +46,8 @@ public class AnalysisService {
     private JdbcTemplate jdbcTemplate;
 
     private String BASE_URL = "http://localhost:3000/";
+
+    private Long page_reach = 0L;
 
     // Calculates the monthly revenue and profit
     public List<RevenueProfitResponse> calculateMonthlyRevenueAndProfit(String tableName) {
@@ -162,6 +166,41 @@ public class AnalysisService {
         } catch (Exception e) {
             log.error("Error fetching count: " + e.getMessage());
             return null;
+        }
+    }
+
+    // Count page reach
+    public void countPageReach(){
+        page_reach++;
+    }
+
+    // Update page reach into database
+    @Transactional
+    public void updatePageReach() {
+        try {
+            // Fetch the current page reach from the database
+            Long currentPageReach = jdbcTemplate.queryForObject(
+                    "SELECT page_reach FROM analytics WHERE id = ?",
+                    new Object[]{1},
+                    Long.class
+            );
+
+            // Sum the fetched value with the local page_reach
+            Long updatedPageReach = (currentPageReach == null ? 0L : currentPageReach) + page_reach;
+
+            // Update the total page reach back into the database
+            jdbcTemplate.update(
+                    "UPDATE analytics SET page_reach = ? WHERE id = ?",
+                    updatedPageReach,
+                    1
+            );
+
+            // Reset local page_reach after updating
+            page_reach = 0L;
+
+        } catch (Exception e) {
+            log.error("Error updating page reach: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
     }
 
