@@ -18,6 +18,7 @@ import com.analyticalsolution.analyticalsolution.service.AnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -109,6 +110,11 @@ public class AnalysisController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Scheduled(cron = "0 0/1 * 1/1 * ?")
+    public void Test(){
+        System.out.println("Hello testing schedular");
     }
 
 }
