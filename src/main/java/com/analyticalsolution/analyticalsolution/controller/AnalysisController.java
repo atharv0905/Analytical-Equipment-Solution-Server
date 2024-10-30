@@ -123,9 +123,31 @@ public class AnalysisController {
         }
     }
 
+    // Get count of repeating customers
+    @GetMapping("/page-reach")
+    public ResponseEntity<?> getPageReach(){
+        try{
+            Long pageReach = analysisService.getPageReach();
+            return new ResponseEntity<>(pageReach, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Scheduled(cron = "0 0/1 * 1/1 * ?")
     public void savePageReachOnInterval(){
         analysisService.updatePageReach();
+    }
+
+    // Get count of repeating customers
+    @GetMapping("/returning-customers")
+    public ResponseEntity<?> getCountOfRepeatingCustomers(){
+        try{
+            Long countOfRepeatingCustomers = analysisService.getCountOfRepeatingCustomers();
+            return new ResponseEntity<>(countOfRepeatingCustomers, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

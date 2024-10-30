@@ -204,4 +204,36 @@ public class AnalysisService {
         }
     }
 
+    // Get page reach
+    public Long getPageReach(){
+        try {
+            String sql = "SELECT page_reach FROM analytics WHERE id = 1";
+
+            return jdbcTemplate.queryForObject(sql, Long.class);
+        } catch (Exception e) {
+            log.error("Error fetching page reach: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Get count of repeating customers
+    public Long getCountOfRepeatingCustomers() {
+        try {
+            String sql = """
+                    SELECT COUNT(customer_id) AS customer_count
+                    FROM (
+                        SELECT customer_id
+                        FROM sales
+                        GROUP BY customer_id
+                        HAVING COUNT(*) >= 2
+                    ) AS frequent_customers;
+                    """;
+
+            return jdbcTemplate.queryForObject(sql, Long.class);
+        } catch (Exception e) {
+            log.error("Error fetching count of returning customers: " + e.getMessage());
+            return null;
+        }
+    }
+
 }
