@@ -8,7 +8,7 @@
  *              detailed insights. It handles exceptions gracefully, providing appropriate HTTP responses for
  *              error handling and ensuring smooth integration with client applications.
  * Created on: 28/10/2024
- * Last Modified: 29/10/2024
+ * Last Modified: 30/10/2024
  */
 
 package com.analyticalsolution.analyticalsolution.controller;
@@ -46,40 +46,10 @@ public class AnalysisController {
 
     // Get top sellers
     @GetMapping("/top-sellers")
-    public ResponseEntity<?> getTopSellers(){
-        try{
-            List<TopSellerResponse> topSellers = analysisService.getTopSellers();
-
-            List<TopSellerResponse> limitedTopSellers = topSellers.stream()
-                    .limit(5)
-                    .collect(Collectors.toList());
-            return new ResponseEntity<>(limitedTopSellers, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    // Get top sellers
-    @GetMapping("/dash/top-sellers")
     public ResponseEntity<?> getTopSellersForDash(){
         try{
             List<TopSellerResponse> topSellers = analysisService.getTopSellers();
             return new ResponseEntity<>(topSellers, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    // Get new arrivals
-    @GetMapping("/new-arrivals")
-    public ResponseEntity<?> getNewArrivals(){
-        try{
-            List<FetchProductsResponse> fetchProductsResponses = analysisService.listAllProductsOrderedByCreation();
-
-            List<FetchProductsResponse> newArrivals = fetchProductsResponses.stream()
-                    .limit(5)
-                    .collect(Collectors.toList());
-            return new ResponseEntity<>(newArrivals, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -112,19 +82,10 @@ public class AnalysisController {
         }
     }
 
-    // Handle page reach
-    @GetMapping("/hit")
-    public ResponseEntity<?> getHit(){
-        try{
-            analysisService.countPageReach();
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     // Get count of repeating customers
+    /* This function is furthur merged in quick stats
     @GetMapping("/page-reach")
+     */
     public ResponseEntity<?> getPageReach(){
         try{
             Long pageReach = analysisService.getPageReach();
@@ -136,11 +97,14 @@ public class AnalysisController {
 
     @Scheduled(cron = "0 0/1 * 1/1 * ?")
     public void savePageReachOnInterval(){
+        System.out.println("Updated page reach");
         analysisService.updatePageReach();
     }
 
     // Get count of repeating customers
+    /* This function is furthur merged in quick stats
     @GetMapping("/returning-customers")
+     */
     public ResponseEntity<?> getCountOfRepeatingCustomers(){
         try{
             Long countOfRepeatingCustomers = analysisService.getCountOfRepeatingCustomers();
@@ -151,11 +115,27 @@ public class AnalysisController {
     }
 
     // Get count of repeating customers
+    /* This function is furthur merged in quick stats
     @GetMapping("/conversion-rate")
+    */
     public ResponseEntity<?> getConversionRate(){
         try{
             Long conversionRate = analysisService.getConversionRate();
             return new ResponseEntity<>(conversionRate, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/quick-stats")
+    public ResponseEntity<?> getQuickStats(){
+        try{
+            Long pageReach = analysisService.getPageReach();
+            Long countOfRepeatingCustomers = analysisService.getCountOfRepeatingCustomers();
+            Long conversionRate = analysisService.getConversionRate();
+
+            QuickStatsResponse quickStatsResponse = new QuickStatsResponse(pageReach, countOfRepeatingCustomers, conversionRate);
+            return new ResponseEntity<>(quickStatsResponse, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

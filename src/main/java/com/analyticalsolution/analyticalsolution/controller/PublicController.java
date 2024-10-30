@@ -7,7 +7,7 @@
  *              or specific products by ID. Additionally, it includes testing endpoints to fetch user details by username or user ID.
  *              It utilizes Spring Security for authentication, JWT for secure sessions, and logs errors to aid in debugging.
  * Created on: 11/10/2024
- * Last Modified: 27/10/2024
+ * Last Modified: 30/10/2024
  */
 
 
@@ -23,10 +23,8 @@ import com.analyticalsolution.analyticalsolution.repository.UserRepository;
 import com.analyticalsolution.analyticalsolution.responses.FetchProductsResponse;
 import com.analyticalsolution.analyticalsolution.responses.LoginResponse;
 import com.analyticalsolution.analyticalsolution.responses.TokenAuthResponse;
-import com.analyticalsolution.analyticalsolution.service.EmailService;
-import com.analyticalsolution.analyticalsolution.service.ProductService;
-import com.analyticalsolution.analyticalsolution.service.UserDetailsServiceImpl;
-import com.analyticalsolution.analyticalsolution.service.UserService;
+import com.analyticalsolution.analyticalsolution.responses.TopSellerResponse;
+import com.analyticalsolution.analyticalsolution.service.*;
 import com.analyticalsolution.analyticalsolution.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +36,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -57,6 +56,9 @@ public class PublicController {
     private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
+    private AnalysisService analysisService;
+
+    @Autowired
     private JwtUtils jwtUtils;
 
     @Autowired
@@ -69,6 +71,17 @@ public class PublicController {
     @GetMapping()
     public String serverCheck(){
         return "Server is running...";
+    }
+
+    // Handle page reach
+    @GetMapping("/hit")
+    public ResponseEntity<?> getHit(){
+        try{
+            analysisService.countPageReach();
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // Send verification email
@@ -198,6 +211,36 @@ public class PublicController {
         } catch (Exception e) {
             log.error("Unexpected error fetching product: ", e);
             return new ResponseEntity<>("Unexpected error fetching product", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Get top sellers
+    @GetMapping("/top-sellers")
+    public ResponseEntity<?> getTopSellers(){
+        try{
+            List<TopSellerResponse> topSellers = analysisService.getTopSellers();
+
+            List<TopSellerResponse> limitedTopSellers = topSellers.stream()
+                    .limit(5)
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(limitedTopSellers, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Get new arrivals
+    @GetMapping("/new-arrivals")
+    public ResponseEntity<?> getNewArrivals(){
+        try{
+            List<FetchProductsResponse> fetchProductsResponses = analysisService.listAllProductsOrderedByCreation();
+
+            List<FetchProductsResponse> newArrivals = fetchProductsResponses.stream()
+                    .limit(5)
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(newArrivals, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
