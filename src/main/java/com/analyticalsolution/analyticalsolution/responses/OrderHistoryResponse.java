@@ -22,6 +22,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderHistoryResponse {
 
+    private String sale_id;
+
     private String order_id;
 
     private String product_id;

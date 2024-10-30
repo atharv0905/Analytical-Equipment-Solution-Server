@@ -149,8 +149,6 @@ public class OrderService {
     @Transactional
     public List<OrderHistoryResponse> getOrderHistoryByUser() {
         try {
-            List<OrderHistoryResponse> orderHistoryList = new ArrayList<>();
-
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User existingUser = userRepository.findUserByUsername(authentication.getName().toString());
             if (existingUser == null) {
@@ -159,55 +157,36 @@ public class OrderService {
             }
 
             String customerID = existingUser.getId();
+            String sql = """
+                        SELECT 
+                            sales.sale_id,
+                            orders.order_id,
+                            orders.product_id,
+                            products.product_name,
+                            products.product_price,
+                            orders.quantity,
+                            JSON_UNQUOTE(JSON_EXTRACT(products.product_images, '$[0]')) AS product_image,
+                            sales.order_date
+                        FROM sales
+                        JOIN orders ON sales.sale_id = orders.sale_id
+                        JOIN products ON orders.product_id = products.product_id
+                        WHERE sales.customer_id = ?
+                    """;
 
-            // Check if the sale's data exists for the user
-            String selectSalesSql = "SELECT sale_id, order_ids FROM sales WHERE customer_id = ?";
-            List<Map<String, Object>> salesData = jdbcTemplate.queryForList(selectSalesSql, new Object[]{customerID});
-
-            if (!salesData.isEmpty()) {
-                for (Map<String, Object> sale : salesData) {
-                    String orderIdsJson = (String) sale.get("order_ids");
-
-                    // Convert JSON string to a list of order IDs
-                    List<String> orderIds = utilityService.parseJsonToList(orderIdsJson);
-
-                    for (String orderId : orderIds) {
-                        // Fetch the order details using the order ID
-                        String selectOrderSql = "SELECT o.product_id, o.quantity, o.order_date, p.product_name, p.product_price, p.product_images " +
-                                "FROM orders o " +
-                                "JOIN products p ON o.product_id = p.product_id " +
-                                "WHERE o.order_id = ?";
-
-                        Map<String, Object> orderData = jdbcTemplate.queryForMap(selectOrderSql, new Object[]{orderId});
-
-                        // Extract the first product image directly from the JSON array
-                        String productImagesJson = (String) orderData.get("product_images");
-                        List<String> images = utilityService.parseJsonToList(productImagesJson);
-                        String productImage = images.isEmpty() ? null : images.get(0);
-                        productImage = BASE_URL + productImage;
-
-                        // Construct OrderHistoryResponse
-                        OrderHistoryResponse orderHistoryResponse = new OrderHistoryResponse(
-                                orderId,
-                                (String) orderData.get("product_id"),
-                                (String) orderData.get("product_name"), // Extract the product_name
-                                orderData.get("product_price").toString(),
-                                (Long) orderData.get("quantity"),
-                                productImage,
-                                orderData.get("order_date").toString()
-                        );
-
-                        // Add to the list
-                        orderHistoryList.add(orderHistoryResponse);
-                    }
-                }
-            } else {
-                log.info("No sales data found for user: " + existingUser.getUsername());
-            }
-
-            return orderHistoryList;
+            return jdbcTemplate.query(sql, new Object[]{customerID}, (rs, rowNum) ->
+                    new OrderHistoryResponse(
+                            rs.getString("sale_id"),
+                            rs.getString("order_id"),
+                            rs.getString("product_id"),
+                            rs.getString("product_name"),
+                            rs.getString("product_price"),
+                            rs.getLong("quantity"),
+                            BASE_URL + rs.getString("product_image"),
+                            rs.getString("order_date")
+                    )
+            );
         } catch (Exception e) {
-            log.error("Error while fetching order history", e);
+            log.error("Error fetching order history: " + e.getMessage());
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return null;
         }
