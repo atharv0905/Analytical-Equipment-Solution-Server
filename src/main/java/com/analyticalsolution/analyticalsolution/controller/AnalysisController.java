@@ -150,4 +150,15 @@ public class AnalysisController {
         }
     }
 
+    // Get count of repeating customers
+    @GetMapping("/conversion-rate")
+    public ResponseEntity<?> getConversionRate(){
+        try{
+            Long conversionRate = analysisService.getConversionRate();
+            return new ResponseEntity<>(conversionRate, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

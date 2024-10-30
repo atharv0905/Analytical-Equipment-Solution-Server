@@ -236,4 +236,23 @@ public class AnalysisService {
         }
     }
 
+    // Get conversion rate
+    public Long getConversionRate() {
+        try {
+            String sql = """
+                    SELECT
+                        (COUNT(s.sale_id) / a.page_reach) * 100 AS sales_ratio
+                    FROM
+                        sales s
+                    CROSS JOIN
+                        (SELECT page_reach FROM analytics WHERE id = 1) a;
+                    """;
+
+            return jdbcTemplate.queryForObject(sql, Long.class);
+        } catch (Exception e) {
+            log.error("Error fetching conversion rate: " + e.getMessage());
+            return null;
+        }
+    }
+
 }
