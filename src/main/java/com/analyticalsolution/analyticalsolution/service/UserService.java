@@ -100,17 +100,28 @@ public class UserService {
 
     // Save user address
     @Transactional
-    public int saveNewAddress(UserAddress address){
+    public int saveNewAddress(UserAddress address, Authentication paramAuth){
         try{
             // Check if the user exists
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            User existingUser = userRepository.findUserByUsername(authentication.getName());
-            if (existingUser == null) {
-                log.error("User not found.");
-                return -2; // if user not exists
+            if(paramAuth == null){
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                User existingUser = userRepository.findUserByUsername(authentication.getName());
+                if (existingUser == null) {
+                    log.error("User not found.");
+                    return -2; // if user not exists
+                }
+                address.setId(UUID.randomUUID().toString());
+                address.setCustomer_id(existingUser.getId());
+            }else {
+                User existingUser = userRepository.findUserByUsername(paramAuth.getName());
+                if (existingUser == null) {
+                    log.error("User not found.");
+                    return -2; // if user not exists
+                }
+                address.setId(UUID.randomUUID().toString());
+                address.setCustomer_id(existingUser.getId());
             }
-            address.setId(UUID.randomUUID().toString());
-            address.setCustomer_id(existingUser.getId());
+
 
             String sql = "INSERT INTO user_address (id, customer_id, address) " + "VALUES (?, ?, ?)";
 

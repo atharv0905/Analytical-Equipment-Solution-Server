@@ -15,9 +15,11 @@
 package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.entity.Sale;
+import com.analyticalsolution.analyticalsolution.requests.CheckoutRequest;
 import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
 import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
 import com.analyticalsolution.analyticalsolution.service.OrderService;
+import com.analyticalsolution.analyticalsolution.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,9 +38,9 @@ public class OrderController {
 
     // Cart checkout
     @PostMapping("/checkout")
-    public ResponseEntity<?> checkout(@RequestBody Sale sale){
+    public ResponseEntity<?> checkout(@RequestBody CheckoutRequest checkoutRequest){
         try{
-            orderService.checkout(sale);
+            orderService.checkout(checkoutRequest);
             return new ResponseEntity<>("Order placed", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error occured while placing order", HttpStatus.INTERNAL_SERVER_ERROR);

@@ -105,7 +105,7 @@ public class ProductService {
     public Product fetchProductById(String productId) {
         try {
             // Select all columns from the products table where product_id matches
-            String sql = "SELECT product_id, product_name, product_desc, product_category, estimated_delivery_time, product_price, product_profit, product_images FROM products WHERE product_id = ?";
+            String sql = "SELECT product_id, product_name, product_desc, product_category, estimated_delivery_time, product_price, product_profit, product_status, product_images FROM products WHERE product_id = ?";
 
             // Use queryForObject to get a single product's details
             return jdbcTemplate.queryForObject(sql, new Object[]{productId}, new ProductRowMapper());

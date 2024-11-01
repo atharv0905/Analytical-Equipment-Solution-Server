@@ -17,14 +17,15 @@ package com.analyticalsolution.analyticalsolution.service;
 
 import com.analyticalsolution.analyticalsolution.entity.Sale;
 import com.analyticalsolution.analyticalsolution.entity.User;
+import com.analyticalsolution.analyticalsolution.entity.UserAddress;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
+import com.analyticalsolution.analyticalsolution.requests.CheckoutRequest;
 import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
 import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
 import com.analyticalsolution.analyticalsolution.responses.ProductInvoiceResponse;
 import com.analyticalsolution.analyticalsolution.utils.UtilityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,6 +49,9 @@ public class OrderService {
     private UtilityService utilityService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private CartService cartService;
 
 //    @Value("${app.base-url}")
@@ -55,8 +59,9 @@ public class OrderService {
 
     // Cart checkout
     @Transactional
-    public void checkout(Sale sale) {
+    public void checkout(CheckoutRequest checkoutRequest) {
         try {
+            Sale sale = checkoutRequest.getSale();
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User existingUser = userRepository.findUserByUsername(authentication.getName().toString());
             if (existingUser == null) {
@@ -69,6 +74,12 @@ public class OrderService {
             // Check if the cart exists for the user
             String sql = "SELECT cart_id FROM cart WHERE customer_id = ?";
             List<String> cartIds = jdbcTemplate.queryForList(sql, new Object[]{customerID}, String.class);
+
+            if(checkoutRequest.getIsNewAddress() == true){
+                UserAddress address = new UserAddress();
+                address.setAddress(sale.getShipping_address());
+                userService.saveNewAddress(address, authentication);
+            }
 
             if (!cartIds.isEmpty()) {
                 // If cart exists, get the cart ID

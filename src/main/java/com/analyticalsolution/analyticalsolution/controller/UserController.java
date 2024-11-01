@@ -62,7 +62,7 @@ public class UserController {
     public ResponseEntity<?> saveNewAddress(@RequestBody UserAddress address) {
         try {
             // Call service method to update the user
-            int saveStatus = userService.saveNewAddress(address);
+            int saveStatus = userService.saveNewAddress(address, null);
 
             if (saveStatus == 1) {
                 // If update is successful, return 200 OK
