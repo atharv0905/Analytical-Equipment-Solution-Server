@@ -21,6 +21,7 @@ import com.analyticalsolution.analyticalsolution.entity.UserAddress;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
 import com.analyticalsolution.analyticalsolution.requests.CheckoutRequest;
 import com.analyticalsolution.analyticalsolution.requests.OfflineCheckoutRequest;
+import com.analyticalsolution.analyticalsolution.requests.ProductCheckoutRequest;
 import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
 import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
 import com.analyticalsolution.analyticalsolution.responses.ProductInvoiceResponse;
@@ -60,14 +61,14 @@ public class OrderService {
 
     // Cart checkout
     @Transactional
-    public void checkout(CheckoutRequest checkoutRequest) {
+    public int checkout(CheckoutRequest checkoutRequest) {
         try {
             Sale sale = checkoutRequest.getSale();
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User existingUser = userRepository.findUserByUsername(authentication.getName().toString());
             if (existingUser == null) {
                 log.error("User not found.");
-                return;
+                return -1;
             }
 
             String customerID = existingUser.getId();
@@ -154,28 +155,27 @@ public class OrderService {
                 }
 
                 log.info("Order and Sale successfully created for user: " + existingUser.getUsername());
+                return 1;
             } else {
                 log.info("No cart found for user: " + existingUser.getUsername());
+                return -1;
             }
 
         } catch (Exception e) {
             log.error("Error occurred while placing order", e);
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return -1;
         }
     }
 
     // Offline order checkout
     @Transactional
-    public void offlineCheckout(OfflineCheckoutRequest checkoutRequest) {
+    public int offlineCheckout(OfflineCheckoutRequest checkoutRequest) {
         try {
             Sale sale = checkoutRequest.getSale();
 
             String customerID = checkoutRequest.getCustomer_id();
             User user = userRepository.findUserById(customerID);
-
-            // Check if the cart exists for the user
-            String sql = "SELECT cart_id FROM cart WHERE customer_id = ?";
-            List<String> cartIds = jdbcTemplate.queryForList(sql, new Object[]{customerID}, String.class);
 
             if(checkoutRequest.getIsNewAddress() == true){
                 UserAddress address = new UserAddress();
@@ -183,78 +183,58 @@ public class OrderService {
                 userService.saveNewAddress(address, user.getUsername());
             }
 
-            if (!cartIds.isEmpty()) {
-                // If cart exists, get the cart ID
-                String cartId = cartIds.get(0);
+            // Default values for order status and sales mode
+            String defaultOrderConfirmationStatus = "ACCEPTED";
+            String defaultOrderStatus = "PENDING";
+            String defaultSalesMode = "OFFLINE";
+            String defaultPaymentStatus = "PAID";
 
-                // Fetch existing item_ids from the cart
-                String selectItemIdsSql = "SELECT item_ids FROM cart WHERE cart_id = ?";
-                String itemIdsJson = jdbcTemplate.queryForObject(selectItemIdsSql, new Object[]{cartId}, String.class);
+            // Use provided values or fallback to default if null
+            String orderConfirmationStatus = sale.getOrder_confirmation_status() != null ? sale.getOrder_confirmation_status() : defaultOrderConfirmationStatus;
+            String orderStatus = sale.getOrder_status() != null ? sale.getOrder_status() : defaultOrderStatus;
+            String saleMode = sale.getSale_mode() != null ? sale.getSale_mode() : defaultSalesMode;
+            String paymentStatus = sale.getPayment_status() != null ? sale.getPayment_status() : defaultPaymentStatus;
 
-                // Convert JSON string to a list of item IDs
-                List<String> itemIds = utilityService.parseJsonToList(itemIdsJson);
+            // Generate a unique sale_id, transaction_id, and invoice_number
+            String saleId = UUID.randomUUID().toString();
+            String createOrderSql = "INSERT INTO orders (order_id, sale_id, product_id, quantity, product_price, product_profit) VALUES (?, ?, ?, ?)";
 
-                // Generate a unique sale_id, transaction_id, and invoice_number
-                String saleId = UUID.randomUUID().toString();
-                String createOrderSql = "INSERT INTO orders (order_id, sale_id, product_id, quantity) VALUES (?, ?, ?, ?)";
+            // Create a new Sale entry in the sales table
+            String createSaleSql = "INSERT INTO sales (sale_id, customer_id, order_confirmation_status, " +
+                    "order_status, shipping_address, contact_phone, transaction_id, payment_status, order_id, sale_mode) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-                // Create a new Sale entry in the sales table
-                String createSaleSql = "INSERT INTO sales (sale_id, customer_id, order_confirmation_status, " +
-                        "order_status, shipping_address, contact_phone, transaction_id, payment_status, order_id, sale_mode) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-                // Default values for order status and sales mode
-                String defaultOrderConfirmationStatus = "ACCEPTED";
-                String defaultOrderStatus = "PENDING";
-                String defaultSalesMode = "OFFLINE";
-                String defaultPaymentStatus = "PAID";
+            // Insert into the sales table
+            jdbcTemplate.update(createSaleSql,
+                    saleId,
+                    customerID,
+                    orderConfirmationStatus,
+                    orderStatus,
+                    sale.getShipping_address(),
+                    sale.getContact_phone(),
+                    sale.getTransaction_id(),
+                    paymentStatus,
+                    sale.getOrder_id(),
+                    saleMode
+            );
 
-                // Use provided values or fallback to default if null
-                String orderConfirmationStatus = sale.getOrder_confirmation_status() != null ? sale.getOrder_confirmation_status() : defaultOrderConfirmationStatus;
-                String orderStatus = sale.getOrder_status() != null ? sale.getOrder_status() : defaultOrderStatus;
-                String saleMode = sale.getSale_mode() != null ? sale.getSale_mode() : defaultSalesMode;
-                String paymentStatus = sale.getPayment_status() != null ? sale.getPayment_status() : defaultPaymentStatus;
+            List<ProductCheckoutRequest> products = checkoutRequest.getProducts();
+            for(ProductCheckoutRequest product: products){
 
-                // Insert into the sales table
-                jdbcTemplate.update(createSaleSql,
-                        saleId,
-                        customerID,
-                        orderConfirmationStatus,
-                        orderStatus,
-                        sale.getShipping_address(),
-                        sale.getContact_phone(),
-                        sale.getTransaction_id(),
-                        paymentStatus,
-                        sale.getOrder_id(),
-                        saleMode
-                );
+                // Generate a unique order_id
+                String orderId = UUID.randomUUID().toString();
 
-                for (String itemId : itemIds) {
-                    // Retrieve product_id and quantity for each item_id from cartitems table
-                    String selectProductSql = "SELECT product_id, quantity FROM cartitems WHERE item_id = ?";
-                    Map<String, Object> cartItemData = jdbcTemplate.queryForMap(selectProductSql, itemId);
-
-                    String productId = (String) cartItemData.get("product_id");
-                    long quantity = (long) cartItemData.get("quantity");
-
-                    // Generate a unique order_id
-                    String orderId = UUID.randomUUID().toString();
-
-                    // Create a new entry in the orders table
-                    jdbcTemplate.update(createOrderSql, orderId, saleId, productId, quantity);
-
-                    // Delete item from cart
-                    cartService.deleteItemFromCart(itemId);
-                }
-
-                log.info("Order and Sale successfully created for user: " + user.getUsername());
-            } else {
-                log.info("No cart found for user: " + user.getUsername());
+                // Create a new entry in the orders table
+                jdbcTemplate.update(createOrderSql, orderId, saleId, product.getProduct_id(), product.getProduct_quantity(), product.getProduct_price(), product.getProduct_profit());
             }
 
+            log.info("Order and Sale successfully created for user: " + user.getUsername());
+            return 1;
         } catch (Exception e) {
             log.error("Error occurred while placing order", e);
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return -1;
         }
     }
 

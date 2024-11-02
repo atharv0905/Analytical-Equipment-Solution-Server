@@ -16,6 +16,7 @@ package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.entity.Sale;
 import com.analyticalsolution.analyticalsolution.requests.CheckoutRequest;
+import com.analyticalsolution.analyticalsolution.requests.OfflineCheckoutRequest;
 import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
 import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
 import com.analyticalsolution.analyticalsolution.service.OrderService;
@@ -40,8 +41,27 @@ public class OrderController {
     @PostMapping("/checkout")
     public ResponseEntity<?> checkout(@RequestBody CheckoutRequest checkoutRequest){
         try{
-            orderService.checkout(checkoutRequest);
-            return new ResponseEntity<>("Order placed", HttpStatus.OK);
+            int checkout = orderService.checkout(checkoutRequest);
+            if(checkout == 1){
+                return new ResponseEntity<>("Order placed", HttpStatus.OK);
+            }else {
+                return new ResponseEntity<>("Order not placed", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error occured while placing order", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Offline order checkout
+    @PostMapping("/offline-checkout")
+    public ResponseEntity<?> offlineCheckout(@RequestBody OfflineCheckoutRequest checkoutRequest){
+        try{
+            int checkout = orderService.offlineCheckout(checkoutRequest);
+            if(checkout == 1){
+                return new ResponseEntity<>("Order placed", HttpStatus.OK);
+            }else {
+                return new ResponseEntity<>("Order not placed", HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>("Error occured while placing order", HttpStatus.INTERNAL_SERVER_ERROR);
         }
