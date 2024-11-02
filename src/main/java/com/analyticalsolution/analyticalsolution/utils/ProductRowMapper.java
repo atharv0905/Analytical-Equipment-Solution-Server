@@ -39,7 +39,7 @@ public class ProductRowMapper implements RowMapper<Product> {
         product.setEstimated_delivery_time(rs.getString("estimated_delivery_time"));
         product.setProduct_price(rs.getLong("product_price"));
         product.setProduct_profit(rs.getLong("product_profit"));
-        product.setProduct_status(rs.getInt("product_status"));
+        product.setProduct_status(rs.getBoolean("product_status"));
 
         // Convert JSON string to List<String>
         String imagesJson = rs.getString("product_images");

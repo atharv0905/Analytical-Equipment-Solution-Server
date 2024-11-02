@@ -38,4 +38,11 @@ public class Order {
     private long quantity;
 
     private Date orderDate;
+
+    @NonNull
+    private Long product_price;
+
+    @NonNull
+    private Long product_profit;
+
 }

@@ -100,10 +100,10 @@ public class UserService {
 
     // Save user address
     @Transactional
-    public int saveNewAddress(UserAddress address, Authentication paramAuth){
+    public int saveNewAddress(UserAddress address, String username){
         try{
             // Check if the user exists
-            if(paramAuth == null){
+            if(username == null){
                 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                 User existingUser = userRepository.findUserByUsername(authentication.getName());
                 if (existingUser == null) {
@@ -113,7 +113,7 @@ public class UserService {
                 address.setId(UUID.randomUUID().toString());
                 address.setCustomer_id(existingUser.getId());
             }else {
-                User existingUser = userRepository.findUserByUsername(paramAuth.getName());
+                User existingUser = userRepository.findUserByUsername(username);
                 if (existingUser == null) {
                     log.error("User not found.");
                     return -2; // if user not exists

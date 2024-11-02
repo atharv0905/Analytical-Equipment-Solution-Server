@@ -47,7 +47,9 @@ public class OrderRepository {
                 rs.getString("sale_id"),
                 rs.getString("product_id"),
                 rs.getLong("quantity"),
-                rs.getDate("order_date")
+                rs.getDate("order_date"),
+                rs.getLong("product_price"),
+                rs.getLong("product_profit")
         );
     }
 

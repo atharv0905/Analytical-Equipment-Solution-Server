@@ -175,6 +175,8 @@ public class ProductService {
 
             // Update the database with the new product information
             String sqlUpdate = "UPDATE products SET product_name = ?, product_desc = ?, product_category = ?, estimated_delivery_time = ?, product_price = ?, product_profit = ?, product_status = ?, product_images = ? WHERE product_id = ?";
+
+            System.out.println(product);
             return jdbcTemplate.update(sqlUpdate,
                     product.getProduct_name(),
                     product.getProduct_desc(),

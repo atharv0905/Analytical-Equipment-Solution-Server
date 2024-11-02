@@ -48,9 +48,8 @@ public class Product {
     private Long product_profit;
 
     @NonNull
-    private Integer product_status;
+    private Boolean product_status;
 
-    @NonNull
     private ArrayList<String> product_images = new ArrayList<>();
 
 }
