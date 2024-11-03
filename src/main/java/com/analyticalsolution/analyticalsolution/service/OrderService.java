@@ -380,32 +380,33 @@ public class OrderService {
         }
     }
 
+    @Transactional
     // Update order confirmation status
     public int updateOrderConfirmationStatus(OrderConfirmationRequest request){
         try{
             String sale_id = request.getSale_id();
-            Sale sale = orderRepository.findSaleById(sale_id);
 
             String sql = "UPDATE sales SET order_confirmation_status = ? WHERE sale_id = ?";
-
             return jdbcTemplate.update(sql, request.getStatus(), sale_id);
         } catch (Exception e) {
             log.error("Error updating order confirmation status: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return -1;
         }
     }
 
+    @Transactional
     // Update order status
     public int updateOrderStatus(OrderConfirmationRequest request){
         try{
             String sale_id = request.getSale_id();
-            Sale sale = orderRepository.findSaleById(sale_id);
 
             String sql = "UPDATE sales SET order_status = ? WHERE sale_id = ?";
 
             return jdbcTemplate.update(sql, request.getStatus(), sale_id);
         } catch (Exception e) {
-            log.error("Error updating order confirmation status: " + e.getMessage());
+            log.error("Error updating order status: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return -1;
         }
     }

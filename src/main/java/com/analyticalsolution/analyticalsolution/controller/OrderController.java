@@ -15,11 +15,13 @@
 package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.entity.Sale;
+import com.analyticalsolution.analyticalsolution.repository.OrderRepository;
 import com.analyticalsolution.analyticalsolution.requests.CheckoutRequest;
 import com.analyticalsolution.analyticalsolution.requests.OfflineCheckoutRequest;
 import com.analyticalsolution.analyticalsolution.requests.OrderConfirmationRequest;
 import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
 import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
+import com.analyticalsolution.analyticalsolution.service.EmailService;
 import com.analyticalsolution.analyticalsolution.service.OrderService;
 import com.analyticalsolution.analyticalsolution.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,12 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     // Cart checkout
     @PostMapping("/checkout")
@@ -97,6 +105,10 @@ public class OrderController {
             if(status == -1){
                 return new ResponseEntity<>("Error updating order confirmation status", HttpStatus.BAD_REQUEST);
             }else {
+                if(request.getStatus() == "ACCEPTED"){
+                    Sale sale = orderRepository.findSaleById(request.getSale_id());
+                    emailService.sendOrderConfirmationMail(sale.getCustomer_id());
+                }
                 return new ResponseEntity<>("Order confirmation status updated successfully", HttpStatus.OK);
             }
         } catch (Exception e) {
@@ -112,6 +124,11 @@ public class OrderController {
             if(status == -1){
                 return new ResponseEntity<>("Error updating order status", HttpStatus.BAD_REQUEST);
             }else {
+                if(request.getStatus().equals("DELIVERED")){
+                    System.out.println(request.getStatus());
+                    Sale sale = orderRepository.findSaleById(request.getSale_id());
+                    emailService.sendOrderStatusMail(sale.getCustomer_id(), sale.getSale_id());
+                }
                 return new ResponseEntity<>("Order status updated successfully", HttpStatus.OK);
             }
         } catch (Exception e) {

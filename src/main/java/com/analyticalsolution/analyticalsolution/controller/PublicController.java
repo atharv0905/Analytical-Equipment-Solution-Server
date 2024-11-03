@@ -20,10 +20,7 @@ import com.analyticalsolution.analyticalsolution.requests.EmailVerificationReque
 import com.analyticalsolution.analyticalsolution.requests.LoginRequest;
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
-import com.analyticalsolution.analyticalsolution.responses.FetchProductsResponse;
-import com.analyticalsolution.analyticalsolution.responses.LoginResponse;
-import com.analyticalsolution.analyticalsolution.responses.TokenAuthResponse;
-import com.analyticalsolution.analyticalsolution.responses.TopSellerResponse;
+import com.analyticalsolution.analyticalsolution.responses.*;
 import com.analyticalsolution.analyticalsolution.service.*;
 import com.analyticalsolution.analyticalsolution.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +63,9 @@ public class PublicController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private OrderService orderService;
 
     // Check whether the server is running
     @GetMapping()
@@ -239,6 +239,17 @@ public class PublicController {
                     .limit(5)
                     .collect(Collectors.toList());
             return new ResponseEntity<>(newArrivals, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Get invoice details
+    @PostMapping("/generate-invoice")
+    public ResponseEntity<?> generateInvoice(@RequestParam String saleID){
+        try{
+            InvoiceResponse invoiceResponse = orderService.generateInvoice(saleID);
+            return new ResponseEntity<>(invoiceResponse, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
