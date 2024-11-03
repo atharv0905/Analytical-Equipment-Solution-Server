@@ -97,7 +97,6 @@ public class AnalysisController {
 
     @Scheduled(cron = "0 0/1 * 1/1 * ?")
     public void savePageReachOnInterval(){
-        System.out.println("Updated page reach");
         analysisService.updatePageReach();
     }
 

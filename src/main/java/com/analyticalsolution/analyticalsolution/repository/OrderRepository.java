@@ -14,6 +14,7 @@
 package com.analyticalsolution.analyticalsolution.repository;
 
 import com.analyticalsolution.analyticalsolution.entity.Order;
+import com.analyticalsolution.analyticalsolution.entity.Sale;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -50,6 +51,44 @@ public class OrderRepository {
                 rs.getDate("order_date"),
                 rs.getLong("product_price"),
                 rs.getLong("product_profit")
+        );
+    }
+
+    public Sale findSaleById(String sale_id){
+        try {
+            String sql = "SELECT * FROM sales WHERE sale_id = ?";
+            return jdbcTemplate.queryForObject(sql, new Object[]{sale_id}, (rs, rowNum) -> {
+                return new Sale(
+                        rs.getString("sale_id"),
+                        rs.getString("customer_id"),
+                        rs.getString("order_confirmation_status"),
+                        rs.getString("order_status"),
+                        rs.getString("shipping_address"),
+                        rs.getLong("contact_phone"),
+                        rs.getString("transaction_id"),
+                        rs.getString("payment_status"),
+                        rs.getString("order_id"),
+                        rs.getString("sale_mode")
+                );
+            });
+        } catch (Exception e) {
+            log.error("Error fetching sale record: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private Sale mapRowToSale(ResultSet rs, int rowNum) throws SQLException {
+        return new Sale(
+                rs.getString("sale_id"),
+                rs.getString("customer_id"),
+                rs.getString("order_confirmation_status"),
+                rs.getString("order_status"),
+                rs.getString("shipping_address"),
+                rs.getLong("contact_phone"),
+                rs.getString("transaction_id"),
+                rs.getString("payment_status"),
+                rs.getString("order_id"),
+                rs.getString("sale_mode")
         );
     }
 

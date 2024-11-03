@@ -18,9 +18,11 @@ package com.analyticalsolution.analyticalsolution.service;
 import com.analyticalsolution.analyticalsolution.entity.Sale;
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.entity.UserAddress;
+import com.analyticalsolution.analyticalsolution.repository.OrderRepository;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
 import com.analyticalsolution.analyticalsolution.requests.CheckoutRequest;
 import com.analyticalsolution.analyticalsolution.requests.OfflineCheckoutRequest;
+import com.analyticalsolution.analyticalsolution.requests.OrderConfirmationRequest;
 import com.analyticalsolution.analyticalsolution.requests.ProductCheckoutRequest;
 import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
 import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
@@ -43,6 +45,9 @@ public class OrderService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -285,6 +290,7 @@ public class OrderService {
         }
     }
 
+    // Generate invoice
     public InvoiceResponse generateInvoice(String saleID) {
         try {
             InvoiceResponse invoiceResponse = new InvoiceResponse();
@@ -371,6 +377,36 @@ public class OrderService {
         } catch (Exception e) {
             log.error("Error fetching data for generating invoice: " + e.getMessage());
             return null;
+        }
+    }
+
+    // Update order confirmation status
+    public int updateOrderConfirmationStatus(OrderConfirmationRequest request){
+        try{
+            String sale_id = request.getSale_id();
+            Sale sale = orderRepository.findSaleById(sale_id);
+
+            String sql = "UPDATE sales SET order_confirmation_status = ? WHERE sale_id = ?";
+
+            return jdbcTemplate.update(sql, request.getStatus(), sale_id);
+        } catch (Exception e) {
+            log.error("Error updating order confirmation status: " + e.getMessage());
+            return -1;
+        }
+    }
+
+    // Update order status
+    public int updateOrderStatus(OrderConfirmationRequest request){
+        try{
+            String sale_id = request.getSale_id();
+            Sale sale = orderRepository.findSaleById(sale_id);
+
+            String sql = "UPDATE sales SET order_status = ? WHERE sale_id = ?";
+
+            return jdbcTemplate.update(sql, request.getStatus(), sale_id);
+        } catch (Exception e) {
+            log.error("Error updating order confirmation status: " + e.getMessage());
+            return -1;
         }
     }
 

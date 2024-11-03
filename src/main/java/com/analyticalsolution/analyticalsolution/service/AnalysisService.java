@@ -28,6 +28,9 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,6 +56,8 @@ public class AnalysisService {
     public List<RevenueProfitResponse> calculateMonthlyRevenueAndProfit(String tableName) {
         List<RevenueProfitResponse> revenueProfitResponses = new ArrayList<>();
         List<Map<DateRange, List<ProductSummaryResponse>>> monthlyProductSummaries = analysisUtils.getMonthlyProductSummaries(tableName);
+        LocalDate currentDate = LocalDate.now(); // Get the current date
+
         for (Map<DateRange, List<ProductSummaryResponse>> monthlySummary : monthlyProductSummaries) {
             for (Map.Entry<DateRange, List<ProductSummaryResponse>> entry : monthlySummary.entrySet()) {
                 DateRange dateRange = entry.getKey();
@@ -78,7 +83,18 @@ public class AnalysisService {
 
                 // Create RevenueProfitResponse for the current month
                 RevenueProfitResponse revenueProfitResponse = new RevenueProfitResponse();
-                revenueProfitResponse.setDate(dateRange.getStartDate());  // Or use an average/representative date if needed
+                // Convert Date to LocalDate
+                LocalDate startDate = dateRange.getStartDate().toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+
+                // Check if the current month matches the month in the date range
+                if (startDate.getMonth() == currentDate.getMonth() &&
+                        startDate.getYear() == currentDate.getYear()) {
+                    revenueProfitResponse.setDate(Date.from(Instant.now())); // Set to current date
+                } else {
+                    revenueProfitResponse.setDate(dateRange.getEndDate());  // Use end date for other months
+                }
                 revenueProfitResponse.setRevenue(totalRevenue);
                 revenueProfitResponse.setProfit(totalProfit);
 
@@ -88,6 +104,45 @@ public class AnalysisService {
 
         return revenueProfitResponses;
     }
+
+//    public List<RevenueProfitResponse> calculateMonthlyRevenueAndProfit(String tableName) {
+//        List<RevenueProfitResponse> revenueProfitResponses = new ArrayList<>();
+//        List<Map<DateRange, List<ProductSummaryResponse>>> monthlyProductSummaries = analysisUtils.getMonthlyProductSummaries(tableName);
+//        for (Map<DateRange, List<ProductSummaryResponse>> monthlySummary : monthlyProductSummaries) {
+//            for (Map.Entry<DateRange, List<ProductSummaryResponse>> entry : monthlySummary.entrySet()) {
+//                DateRange dateRange = entry.getKey();
+//                List<ProductSummaryResponse> productSummaries = entry.getValue();
+//
+//                long totalRevenue = 0;
+//                long totalProfit = 0;
+//
+//                for (ProductSummaryResponse productSummary : productSummaries) {
+//                    String productId = productSummary.getProductId();
+//                    long quantity = productSummary.getTotalQuantity();
+//
+//                    Product product = productService.fetchProductById(productId);
+//                    if (product != null) {
+//                        // Calculate revenue and profit
+//                        long revenue = quantity * product.getProduct_price();
+//                        long profit = quantity * product.getProduct_profit();
+//
+//                        totalRevenue += revenue;
+//                        totalProfit += profit;
+//                    }
+//                }
+//
+//                // Create RevenueProfitResponse for the current month
+//                RevenueProfitResponse revenueProfitResponse = new RevenueProfitResponse();
+//                revenueProfitResponse.setDate(dateRange.getEndDate());  // Or use an average/representative date if needed
+//                revenueProfitResponse.setRevenue(totalRevenue);
+//                revenueProfitResponse.setProfit(totalProfit);
+//
+//                revenueProfitResponses.add(revenueProfitResponse);
+//            }
+//        }
+//
+//        return revenueProfitResponses;
+//    }
 
     // Get top sellers
     public List<TopSellerResponse> getTopSellers() {

@@ -17,6 +17,7 @@ package com.analyticalsolution.analyticalsolution.controller;
 import com.analyticalsolution.analyticalsolution.entity.Sale;
 import com.analyticalsolution.analyticalsolution.requests.CheckoutRequest;
 import com.analyticalsolution.analyticalsolution.requests.OfflineCheckoutRequest;
+import com.analyticalsolution.analyticalsolution.requests.OrderConfirmationRequest;
 import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
 import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
 import com.analyticalsolution.analyticalsolution.service.OrderService;
@@ -88,4 +89,33 @@ public class OrderController {
         }
     }
 
+    // Update order confirmation status
+    @PutMapping("/update-order-confirmation")
+    public ResponseEntity<?> updateOrderConfirmationStatus(@RequestBody OrderConfirmationRequest request){
+        try{
+            int status = orderService.updateOrderConfirmationStatus(request);
+            if(status == -1){
+                return new ResponseEntity<>("Error updating order confirmation status", HttpStatus.BAD_REQUEST);
+            }else {
+                return new ResponseEntity<>("Order confirmation status updated successfully", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Update order confirmation status
+    @PutMapping("/update-order-status")
+    public ResponseEntity<?> updateOrderStatus(@RequestBody OrderConfirmationRequest request){
+        try{
+            int status = orderService.updateOrderStatus(request);
+            if(status == -1){
+                return new ResponseEntity<>("Error updating order status", HttpStatus.BAD_REQUEST);
+            }else {
+                return new ResponseEntity<>("Order status updated successfully", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
