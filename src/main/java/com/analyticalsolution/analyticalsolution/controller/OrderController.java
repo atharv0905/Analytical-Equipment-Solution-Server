@@ -135,4 +135,16 @@ public class OrderController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // Get all sales
+    @GetMapping("/all-sales")
+    public ResponseEntity<?> getAllSales(){
+        try{
+            List<Sale> allSales = orderService.getAllSales();
+            return new ResponseEntity<>(allSales, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error occured while fetching all sales", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

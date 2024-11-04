@@ -10,7 +10,7 @@
  *              proper handling of user authentication and integrates with other services such as
  *              `CartService` to facilitate a seamless order management experience.
  * Created on: 15/10/2024
- * Last Modified: 29/10/2024
+ * Last Modified: 04/11/2024
  */
 
 package com.analyticalsolution.analyticalsolution.service;
@@ -408,6 +408,17 @@ public class OrderService {
             log.error("Error updating order status: " + e.getMessage());
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return -1;
+        }
+    }
+
+    // Get all sales
+    public List<Sale> getAllSales(){
+        try{
+            List<Sale> allSales = orderRepository.findAllSales();
+            return allSales;
+        } catch (Exception e) {
+            log.error("Error fetching sales details: " + e.getMessage());
+            return null;
         }
     }
 

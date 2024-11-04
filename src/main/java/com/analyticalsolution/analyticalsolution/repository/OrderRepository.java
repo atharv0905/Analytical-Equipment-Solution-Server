@@ -8,7 +8,7 @@
  *              result set to an Order object. The repository handles database connectivity, ensuring efficient
  *              data access and streamlined query handling.
  * Created on: 28/10/2024
- * Last Modified: 29/10/2024
+ * Last Modified: 04/11/2024
  */
 
 package com.analyticalsolution.analyticalsolution.repository;
@@ -40,6 +40,11 @@ public class OrderRepository {
     public List<Order> findOrdersByDateRange(Date startDate, Date endDate) {
         String sql = "SELECT * FROM orders WHERE order_date BETWEEN ? AND ?";
         return jdbcTemplate.query(sql, this::mapRowToOrder, startDate, endDate);
+    }
+
+    public List<Sale> findAllSales(){
+        String sql = "SELECT * FROM sales";
+        return jdbcTemplate.query(sql, this::mapRowToSale);
     }
 
     private Order mapRowToOrder(ResultSet rs, int rowNum) throws SQLException {
