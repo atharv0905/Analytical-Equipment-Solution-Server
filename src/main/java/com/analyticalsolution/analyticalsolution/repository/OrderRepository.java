@@ -73,7 +73,8 @@ public class OrderRepository {
                         rs.getString("transaction_id"),
                         rs.getString("payment_status"),
                         rs.getString("order_id"),
-                        rs.getString("sale_mode")
+                        rs.getString("sale_mode"),
+                        rs.getDate("order_date")
                 );
             });
         } catch (Exception e) {
@@ -93,7 +94,8 @@ public class OrderRepository {
                 rs.getString("transaction_id"),
                 rs.getString("payment_status"),
                 rs.getString("order_id"),
-                rs.getString("sale_mode")
+                rs.getString("sale_mode"),
+                rs.getDate("order_date")
         );
     }
 

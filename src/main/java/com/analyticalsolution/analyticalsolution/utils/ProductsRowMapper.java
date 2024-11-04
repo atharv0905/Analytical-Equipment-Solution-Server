@@ -28,7 +28,7 @@ import java.util.ArrayList;
 public class ProductsRowMapper implements RowMapper<FetchProductsResponse> {
 
 //    @Value("${app.base-url}")
-    private String BASE_URL = "http://localhost:3000/";
+    private String BASE_URL = "http://10.10.9.124:3000/";
 
     @Override
     public FetchProductsResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
