@@ -202,7 +202,7 @@ public class OrderService {
 
             // Generate a unique sale_id, transaction_id, and invoice_number
             String saleId = UUID.randomUUID().toString();
-            String createOrderSql = "INSERT INTO orders (order_id, sale_id, product_id, quantity, product_price, product_profit) VALUES (?, ?, ?, ?)";
+            String createOrderSql = "INSERT INTO orders (order_id, sale_id, product_id, quantity, product_price, product_profit) VALUES (?, ?, ?, ?, ?, ?)";
 
             // Create a new Sale entry in the sales table
             String createSaleSql = "INSERT INTO sales (sale_id, customer_id, order_confirmation_status, " +

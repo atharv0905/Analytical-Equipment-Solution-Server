@@ -72,6 +72,7 @@ public class OrderController {
                 return new ResponseEntity<>("Order not placed", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
+            log.error("Error creating offline order: " + e.getMessage());
             return new ResponseEntity<>("Error occured while placing order", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

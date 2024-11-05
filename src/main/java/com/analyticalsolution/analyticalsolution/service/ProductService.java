@@ -194,4 +194,28 @@ public class ProductService {
         }
     }
 
+    // Update product without images
+    @Transactional
+    public int updateProductWithoutImages(Product product) {
+        try {
+            // Update the database with the new product information
+            String sqlUpdate = "UPDATE products SET product_name = ?, product_desc = ?, product_category = ?, estimated_delivery_time = ?, product_price = ?, product_profit = ?, product_status = ? WHERE product_id = ?";
+
+            System.out.println(product);
+            return jdbcTemplate.update(sqlUpdate,
+                    product.getProduct_name(),
+                    product.getProduct_desc(),
+                    product.getProduct_category(),
+                    product.getEstimated_delivery_time(),
+                    product.getProduct_price(),
+                    product.getProduct_profit(),
+                    product.getProduct_status(),
+                    product.getProduct_id());
+        } catch (Exception e) {
+            log.error("Unexpected error updating product: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return -1;
+        }
+    }
+
 }

@@ -73,16 +73,19 @@ public class ProductController {
 
     // Update product
     @PutMapping("/update")
-    public ResponseEntity<?> updateProduct(@ModelAttribute Product product, @RequestParam("productImages") MultipartFile[] productImages) {
+    public ResponseEntity<?> updateProduct(@ModelAttribute Product product, @RequestParam(value = "productImages", required = false) MultipartFile[] productImages) {
         try {
-            if (productImages == null || productImages.length == 0) {
-                return new ResponseEntity<>("Product images are required", HttpStatus.BAD_REQUEST);
-            }
 
-            int result = productService.updateProduct(product, productImages);
-            if (result == -1) {
-                // Product update failed
-                return new ResponseEntity<>("Product update failed: Invalid data.", HttpStatus.BAD_REQUEST);
+            if (productImages == null || productImages.length == 0) {
+                int result = productService.updateProductWithoutImages(product);
+                if (result == -1) {
+                    return new ResponseEntity<>("Product update failed: Invalid data.", HttpStatus.BAD_REQUEST);
+                }
+            }else {
+                int result = productService.updateProduct(product, productImages);
+                if (result == -1) {
+                    return new ResponseEntity<>("Product update failed: Invalid data.", HttpStatus.BAD_REQUEST);
+                }
             }
 
             return new ResponseEntity<>("Product updated successfully", HttpStatus.OK);

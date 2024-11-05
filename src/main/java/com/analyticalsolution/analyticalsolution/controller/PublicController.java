@@ -13,6 +13,7 @@
 package com.analyticalsolution.analyticalsolution.controller;
 
 import com.analyticalsolution.analyticalsolution.entity.Product;
+import com.analyticalsolution.analyticalsolution.repository.ProductRepository;
 import com.analyticalsolution.analyticalsolution.requests.EmailRequest;
 import com.analyticalsolution.analyticalsolution.requests.EmailVerificationRequest;
 import com.analyticalsolution.analyticalsolution.requests.LoginRequest;
@@ -64,6 +65,9 @@ public class PublicController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     // Check whether the server is running
     @GetMapping()
@@ -179,6 +183,18 @@ public class PublicController {
             List<FetchProductsResponse> products = productService.fetchAllProducts();
             return new ResponseEntity<>(products, HttpStatus.OK);
         } catch (Exception e) {
+            return new ResponseEntity<>("Unexpected error while fetching products", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Fetch all products
+    @GetMapping("/getAllProducts")
+    public ResponseEntity<?> getAllProductsForAdmin() {
+        try {
+            List<Product> all = productRepository.findAll();
+            return new ResponseEntity<>(all, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error fetching all products: " + e.getMessage());
             return new ResponseEntity<>("Unexpected error while fetching products", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
