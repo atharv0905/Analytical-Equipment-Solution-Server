@@ -12,21 +12,15 @@
 
 package com.analyticalsolution.analyticalsolution.service;
 
-import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
 import com.analyticalsolution.analyticalsolution.requests.EmailVerificationRequest;
 import com.analyticalsolution.analyticalsolution.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -243,9 +237,9 @@ public class EmailService {
         }
     }
 
-    // Send password reset mail
+    // Send order delivered mail
     @Transactional
-    public Boolean sendOrderStatusMail(String customer_id, String sale_id) {
+    public Boolean sendOrderDeliveredMail(String customer_id, String sale_id) {
         try {
             System.out.println("Sending order status mail...");
             // Query to find the username associated with the email
@@ -276,6 +270,50 @@ public class EmailService {
                     messageHelper.setText(body, true); // Set to 'true' for HTML content
                 };
 
+
+                javaMailSender.send(messagePreparator);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            log.error("Exception while sending email: " + e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return false;
+        }
+    }
+
+    // Send order dispatched mail
+    @Transactional
+    public Boolean sendOrderDispatchedMail(String customer_id, String sale_id) {
+        try {
+            System.out.println("Sending order status mail...");
+            // Query to find the username associated with the email
+            String getUserSql = "SELECT email FROM users WHERE id = ?";
+            String email = jdbcTemplate.queryForObject(getUserSql, new Object[]{customer_id}, String.class);
+            System.out.println(email);
+            if (email != null) {
+                MimeMessagePreparator messagePreparator = mimeMessage -> {
+                    MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+                    messageHelper.setFrom("atharvmirgal09@gmail.com");
+                    messageHelper.setTo(email);
+                    messageHelper.setSubject("Order Dispatched Successfully");
+
+                    // Enhanced HTML content for order dispatch notification with invoice download button
+                    String body = "<div style='font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>" +
+                            "<h1 style='color: #1a73e8; text-align: center;'>Your Order is on its Way!</h1>" +
+                            "<p style='font-size: 16px;'>Hello,</p>" +
+                            "<p style='font-size: 15px;'>We are excited to inform you that your order has been <strong>successfully dispatched</strong> and is on its way to you!</p>" +
+                            "<p style='font-size: 15px;'>We hope you will enjoy your purchase. To download your invoice, please click the button below:</p>" +
+                            "<p style='text-align: center; margin: 20px 0;'>" +
+                            "<a href='http://localhost:5501/user/view/invoice.html?saleId=" + sale_id + "' style='display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: white; font-size: 16px; text-decoration: none; border-radius: 5px;'>Download Invoice</a>" +
+                            "</p>" +
+                            "<hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;'>" +
+                            "<p style='text-align: center; font-size: 14px; color: #555;'>Thank you for choosing Analytical Equipments Solutions! We look forward to serving you again.</p>" +
+                            "<p style='text-align: center; font-size: 12px; color: #999;'>If you have any questions, please contact our support team.</p>" +
+                            "</div>";
+
+                    messageHelper.setText(body, true); // Set to 'true' for HTML content
+                };
 
                 javaMailSender.send(messagePreparator);
                 return true;

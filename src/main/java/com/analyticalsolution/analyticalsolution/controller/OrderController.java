@@ -23,7 +23,6 @@ import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
 import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
 import com.analyticalsolution.analyticalsolution.service.EmailService;
 import com.analyticalsolution.analyticalsolution.service.OrderService;
-import com.analyticalsolution.analyticalsolution.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -67,6 +66,7 @@ public class OrderController {
         try{
             int checkout = orderService.offlineCheckout(checkoutRequest);
             if(checkout == 1){
+                emailService.sendOrderConfirmationMail(checkoutRequest.getCustomer_id());
                 return new ResponseEntity<>("Order placed", HttpStatus.OK);
             }else {
                 return new ResponseEntity<>("Order not placed", HttpStatus.BAD_REQUEST);
@@ -128,7 +128,12 @@ public class OrderController {
                 if(request.getStatus().equals("DELIVERED")){
                     System.out.println(request.getStatus());
                     Sale sale = orderRepository.findSaleById(request.getSale_id());
-                    emailService.sendOrderStatusMail(sale.getCustomer_id(), sale.getSale_id());
+                    emailService.sendOrderDeliveredMail(sale.getCustomer_id(), sale.getSale_id());
+                }
+                if(request.getStatus().equals("DISPATCHED")){
+                    System.out.println(request.getStatus());
+                    Sale sale = orderRepository.findSaleById(request.getSale_id());
+                    emailService.sendOrderDispatchedMail(sale.getCustomer_id(), sale.getSale_id());
                 }
                 return new ResponseEntity<>("Order status updated successfully", HttpStatus.OK);
             }
