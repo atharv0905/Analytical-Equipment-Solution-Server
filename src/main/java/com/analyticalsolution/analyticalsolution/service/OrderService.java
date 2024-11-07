@@ -24,10 +24,7 @@ import com.analyticalsolution.analyticalsolution.requests.CheckoutRequest;
 import com.analyticalsolution.analyticalsolution.requests.OfflineCheckoutRequest;
 import com.analyticalsolution.analyticalsolution.requests.OrderConfirmationRequest;
 import com.analyticalsolution.analyticalsolution.requests.ProductCheckoutRequest;
-import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
-import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
-import com.analyticalsolution.analyticalsolution.responses.ProductInvoiceResponse;
-import com.analyticalsolution.analyticalsolution.responses.UserResponse;
+import com.analyticalsolution.analyticalsolution.responses.*;
 import com.analyticalsolution.analyticalsolution.utils.UtilityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -414,9 +411,9 @@ public class OrderService {
     }
 
     // Get all sales
-    public List<Sale> getAllSales(){
+    public List<SaleResponse> getAllSales(){
         try{
-            List<Sale> allSales = orderRepository.findAllSales();
+            List<SaleResponse> allSales = orderRepository.findAllSales();
             return allSales;
         } catch (Exception e) {
             log.error("Error fetching sales details: " + e.getMessage());

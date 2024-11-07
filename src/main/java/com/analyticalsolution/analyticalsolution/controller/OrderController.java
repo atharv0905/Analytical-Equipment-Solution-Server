@@ -21,6 +21,7 @@ import com.analyticalsolution.analyticalsolution.requests.OfflineCheckoutRequest
 import com.analyticalsolution.analyticalsolution.requests.OrderConfirmationRequest;
 import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
 import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
+import com.analyticalsolution.analyticalsolution.responses.SaleResponse;
 import com.analyticalsolution.analyticalsolution.service.EmailService;
 import com.analyticalsolution.analyticalsolution.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -146,7 +147,7 @@ public class OrderController {
     @GetMapping("/all-sales")
     public ResponseEntity<?> getAllSales(){
         try{
-            List<Sale> allSales = orderService.getAllSales();
+            List<SaleResponse> allSales = orderService.getAllSales();
             return new ResponseEntity<>(allSales, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error occured while fetching all sales", HttpStatus.INTERNAL_SERVER_ERROR);

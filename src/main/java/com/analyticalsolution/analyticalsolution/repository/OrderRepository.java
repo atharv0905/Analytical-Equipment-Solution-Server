@@ -15,6 +15,7 @@ package com.analyticalsolution.analyticalsolution.repository;
 
 import com.analyticalsolution.analyticalsolution.entity.Order;
 import com.analyticalsolution.analyticalsolution.entity.Sale;
+import com.analyticalsolution.analyticalsolution.responses.SaleResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -42,8 +43,8 @@ public class OrderRepository {
         return jdbcTemplate.query(sql, this::mapRowToOrder, startDate, endDate);
     }
 
-    public List<Sale> findAllSales(){
-        String sql = "SELECT * FROM sales";
+    public List<SaleResponse> findAllSales(){
+        String sql = "SELECT * FROM sales_with_customer_name";
         return jdbcTemplate.query(sql, this::mapRowToSale);
     }
 
@@ -83,10 +84,11 @@ public class OrderRepository {
         }
     }
 
-    private Sale mapRowToSale(ResultSet rs, int rowNum) throws SQLException {
-        return new Sale(
+    private SaleResponse mapRowToSale(ResultSet rs, int rowNum) throws SQLException {
+        return new SaleResponse(
                 rs.getString("sale_id"),
                 rs.getString("customer_id"),
+                rs.getString("customer_name"),
                 rs.getString("order_confirmation_status"),
                 rs.getString("order_status"),
                 rs.getString("shipping_address"),
