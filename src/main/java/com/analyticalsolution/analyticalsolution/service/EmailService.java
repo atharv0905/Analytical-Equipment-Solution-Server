@@ -45,10 +45,14 @@ public class EmailService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private String BASE_URL = "http://localhost:3000/";
+    private String BASE_URL = "http://192.168.0.118:3000/";
 
 //    @Value("${app.sentTo}")
     private String sentTo = "atharvmirgal09@gmail.com";
+
+    private String CLIENT_IP = "192.168.0.118";
+
+    private Integer CLIENT_PORT = 5501;
 
     // Send contact email
     @Transactional
@@ -75,7 +79,6 @@ public class EmailService {
     @Transactional
     public void sendVerificationMail(String email){
         try {
-            System.out.println(email);
 
             String token = jwtUtils.generateVerificationToken(email);
 
@@ -91,7 +94,7 @@ public class EmailService {
                         "<p style='font-size: 16px;'>Hello,</p>" +
                         "<p style='font-size: 15px;'>Thank you for signing up! To complete your registration, please verify your email address by clicking the button below:</p>" +
                         "<p style='text-align: center; margin: 20px 0;'>" +
-                        "<a href='" + "http://localhost:5501/user/view/email-verify.html?token=" + token + "' style='display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: white; font-size: 16px; text-decoration: none; border-radius: 5px;'>Verify Email</a>" +
+                        "<a href='" + "http://"+ CLIENT_IP + ":" + CLIENT_PORT+ "/user/view/email-verify.html?token=" + token + "&email="+ email +"' style='display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: white; font-size: 16px; text-decoration: none; border-radius: 5px;'>Verify Email</a>" +
                         "</p>" +
                         "<p style='font-size: 14px; color: #555;'>If you did not create an account, please disregard this email.</p>" +
                         "<hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;'>" +
@@ -137,9 +140,10 @@ public class EmailService {
                 jdbcTemplate.update(sql, true, emailVerificationRequest.getEmail());
                 return true;
             }
-            return true;
+            return false;
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            log.error("Error verifying mail: " + e.getMessage());
             return false;
         }
     }
@@ -169,7 +173,7 @@ public class EmailService {
                             "<p style='font-size: 16px;'>Hello,</p>" +
                             "<p style='font-size: 15px;'>We received a request to reset your account password. To proceed, please click the button below:</p>" +
                             "<p style='text-align: center; margin: 20px 20px;'>" +
-                            "<a href='" + "http://localhost:5501/user/view/reset-password.html?token=" + token + "' style='display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: white; font-size: 16px; text-decoration: none; border-radius: 5px;'>Reset Password</a>" +
+                            "<a href='" + "http://" + CLIENT_IP + ":" + CLIENT_PORT+ "/user/view/reset-password.html?token=" + token + "' style='display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: white; font-size: 16px; text-decoration: none; border-radius: 5px;'>Reset Password</a>" +
                             "</p>" +
                             "<p style='font-size: 14px; color: #555;'>If you did not request a password reset, please ignore this email or contact support if you have concerns.</p>" +
                             "<hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;'>" +
@@ -260,7 +264,7 @@ public class EmailService {
                             "<p style='font-size: 15px;'>We are pleased to inform you that your order has been <strong>successfully delivered</strong> to your specified address.</p>" +
                             "<p style='font-size: 15px;'>We hope you enjoy your purchase and that it meets your expectations. To download your invoice, please click the button below:</p>" +
                             "<p style='text-align: center; margin: 20px 0;'>" +
-                            "<a href='http://localhost:5501/user/view/invoice.html?saleId=" + sale_id + "' style='display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: white; font-size: 16px; text-decoration: none; border-radius: 5px;'>Download Invoice</a>" +
+                            "<a href='http://" + CLIENT_IP + ":" + CLIENT_PORT+ "/user/view/invoice.html?saleId=" + sale_id + "' style='display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: white; font-size: 16px; text-decoration: none; border-radius: 5px;'>Download Invoice</a>" +
                             "</p>" +
                             "<hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;'>" +
                             "<p style='text-align: center; font-size: 14px; color: #555;'>Thank you for choosing Analytical Equipments Solutions! We look forward to serving you again.</p>" +
@@ -305,7 +309,7 @@ public class EmailService {
                             "<p style='font-size: 15px;'>We are excited to inform you that your order has been <strong>successfully dispatched</strong> and is on its way to you!</p>" +
                             "<p style='font-size: 15px;'>We hope you will enjoy your purchase. To download your invoice, please click the button below:</p>" +
                             "<p style='text-align: center; margin: 20px 0;'>" +
-                            "<a href='http://localhost:5501/user/view/invoice.html?saleId=" + sale_id + "' style='display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: white; font-size: 16px; text-decoration: none; border-radius: 5px;'>Download Invoice</a>" +
+                            "<a href='http://" + CLIENT_IP + ":" + CLIENT_PORT+ "/user/view/invoice.html?saleId=" + sale_id + "' style='display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: white; font-size: 16px; text-decoration: none; border-radius: 5px;'>Download Invoice</a>" +
                             "</p>" +
                             "<hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;'>" +
                             "<p style='text-align: center; font-size: 14px; color: #555;'>Thank you for choosing Analytical Equipments Solutions! We look forward to serving you again.</p>" +

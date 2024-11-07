@@ -48,7 +48,7 @@ public class CartService {
     @Autowired
     private UtilityService utilityService;
 
-    private String BASE_URL = "http://localhost:3000/";
+    private String BASE_URL = "http://192.168.0.118:3000/";
 
     // Add item to cart
     @Transactional

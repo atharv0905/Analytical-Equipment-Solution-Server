@@ -117,6 +117,7 @@ public class PublicController {
     @PostMapping("/verify")
     public ResponseEntity<?> verify(@RequestBody EmailVerificationRequest emailVerificationRequest){
         try{
+            System.out.println("Verify hit");
             Boolean isValid = emailService.verifyEmail(emailVerificationRequest);
             return new ResponseEntity<>(isValid, HttpStatus.OK);
         } catch (Exception e) {
