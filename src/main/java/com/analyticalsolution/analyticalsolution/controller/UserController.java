@@ -14,6 +14,7 @@ package com.analyticalsolution.analyticalsolution.controller;
 import com.analyticalsolution.analyticalsolution.entity.User;
 import com.analyticalsolution.analyticalsolution.entity.UserAddress;
 import com.analyticalsolution.analyticalsolution.repository.UserRepository;
+import com.analyticalsolution.analyticalsolution.responses.UserResponse;
 import com.analyticalsolution.analyticalsolution.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +104,7 @@ public class UserController {
         }
     }
 
-    // Update address
+    // Delete address
     @DeleteMapping("/delete-address/{addressID}")
     public ResponseEntity<?> deleteAddress(@PathVariable String addressID) {
         try {
@@ -170,7 +171,7 @@ public class UserController {
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User existingUser = userRepository.findUserByUsername(authentication.getName());
-            User user = userRepository.findUserById(existingUser.getId());
+            UserResponse user = userRepository.findUserById(existingUser.getId());
             return new ResponseEntity<>(user, HttpStatus.OK);
 
         }catch (Exception e){

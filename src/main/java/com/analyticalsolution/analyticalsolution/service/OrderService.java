@@ -27,9 +27,11 @@ import com.analyticalsolution.analyticalsolution.requests.ProductCheckoutRequest
 import com.analyticalsolution.analyticalsolution.responses.InvoiceResponse;
 import com.analyticalsolution.analyticalsolution.responses.OrderHistoryResponse;
 import com.analyticalsolution.analyticalsolution.responses.ProductInvoiceResponse;
+import com.analyticalsolution.analyticalsolution.responses.UserResponse;
 import com.analyticalsolution.analyticalsolution.utils.UtilityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -61,7 +63,6 @@ public class OrderService {
     @Autowired
     private CartService cartService;
 
-//    @Value("${app.base-url}")
     private String BASE_URL = "http://localhost:3000/";
 
     // Cart checkout
@@ -180,7 +181,7 @@ public class OrderService {
             Sale sale = checkoutRequest.getSale();
 
             String customerID = checkoutRequest.getCustomer_id();
-            User user = userRepository.findUserById(customerID);
+            UserResponse user = userRepository.findUserById(customerID);
 
             if(checkoutRequest.getIsNewAddress() == true){
                 UserAddress address = new UserAddress();
@@ -269,6 +270,7 @@ public class OrderService {
                         JOIN orders ON sales.sale_id = orders.sale_id
                         JOIN products ON orders.product_id = products.product_id
                         WHERE sales.customer_id = ?
+                        ORDER BY sales.order_date DESC;
                     """;
 
             return jdbcTemplate.query(sql, new Object[]{customerID}, (rs, rowNum) ->

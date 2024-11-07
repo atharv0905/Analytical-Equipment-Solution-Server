@@ -48,7 +48,6 @@ public class CartService {
     @Autowired
     private UtilityService utilityService;
 
-//    @Value("${app.base-url}")
     private String BASE_URL = "http://localhost:3000/";
 
     // Add item to cart

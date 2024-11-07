@@ -90,7 +90,7 @@ public class ProductService {
     @Transactional
     public List<FetchProductsResponse> fetchAllProducts() {
         try {
-            String sql = "SELECT product_id, product_name, product_desc, product_category, product_images FROM products";
+            String sql = "SELECT product_id, product_name, product_desc, product_category, product_images FROM products WHERE product_status = true";
 
             return jdbcTemplate.query(sql, new ProductsRowMapper());
         } catch (Exception e) {

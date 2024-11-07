@@ -277,7 +277,7 @@ public class PublicController {
 
     // Temporary method to fetch user by user id
     @GetMapping("/getUserByUID/{uid}")
-    public User getUserByUID(@PathVariable String uid){
+    public UserResponse getUserByUID(@PathVariable String uid){
         return userRepository.findUserById(uid);
     }
 }

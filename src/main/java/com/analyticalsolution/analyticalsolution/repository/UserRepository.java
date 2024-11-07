@@ -12,11 +12,14 @@
 package com.analyticalsolution.analyticalsolution.repository;
 
 import com.analyticalsolution.analyticalsolution.entity.User;
+import com.analyticalsolution.analyticalsolution.responses.AddressInfo;
+import com.analyticalsolution.analyticalsolution.responses.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -49,8 +52,8 @@ public class UserRepository {
 
                 String rolesJson = rs.getString("roles");
                 try {
-                    List<String> addresses = findAddressesByCustomerId(user.getId());
-                    user.setAddresses(addresses);
+//                    List<String> addresses = findAddressesByCustomerId(user.getId());
+//                    user.setAddresses(addresses);
                     user.setRoles(objectMapper.readValue(rolesJson, new TypeReference<ArrayList<String>>() {}));
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
@@ -66,12 +69,12 @@ public class UserRepository {
     }
 
     // Find user by ID
-    public User findUserById(String userId) {
+    public UserResponse findUserById(String userId) {
         try {
             String sql = "SELECT * FROM users WHERE id = ?";
-            List<String> addresses = findAddressesByCustomerId(userId);
+            List<AddressInfo> addresses = findAddressesByCustomerId(userId);
             return jdbcTemplate.queryForObject(sql, new Object[]{userId}, (rs, rowNum) -> {
-                User user = new User();
+                UserResponse user = new UserResponse();
                 user.setId(rs.getString("id"));
                 user.setUsername(rs.getString("username"));
                 user.setName(rs.getString("name"));
@@ -96,17 +99,15 @@ public class UserRepository {
         }
     }
 
-    public List<String> findAddressesByCustomerId(String customerId) {
+    public List<AddressInfo> findAddressesByCustomerId(String customerId) {
         try {
-            String sql = "SELECT address FROM user_address WHERE customer_id = ?";
-
-            return jdbcTemplate.query(sql, new Object[]{customerId}, (rs, rowNum) ->
-                    rs.getString("address")
+            String sql = "SELECT id, address FROM user_address WHERE customer_id = ?";
+            return jdbcTemplate.query(sql, new String[]{customerId}, (rs, rowNum) ->
+                    new AddressInfo(rs.getString("id"), rs.getString("address"))
             );
-
-        } catch (Exception e) {
-            log.error("Error finding addresses by customer ID: " + e.getMessage());
-            return Collections.emptyList(); // Return an empty list in case of an error
+        } catch (DataAccessException e) {
+            log.error("Error finding addresses for customer ID " + customerId, e);
+            return Collections.emptyList();
         }
     }
 

@@ -1,17 +1,13 @@
 package com.analyticalsolution.analyticalsolution.repository;
 
-import com.analyticalsolution.analyticalsolution.entity.Order;
 import com.analyticalsolution.analyticalsolution.entity.Product;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -22,7 +18,7 @@ public class ProductRepository {
     private JdbcTemplate jdbcTemplate;
 
     public List<Product> findAll(){
-        String sql = "SELECT * FROM products";
+        String sql = "SELECT * FROM products WHERE product_status = true";
         return jdbcTemplate.query(sql, this::mapRowToProduct);
     }
 

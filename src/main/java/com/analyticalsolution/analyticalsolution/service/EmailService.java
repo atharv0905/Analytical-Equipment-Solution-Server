@@ -17,6 +17,7 @@ import com.analyticalsolution.analyticalsolution.requests.EmailVerificationReque
 import com.analyticalsolution.analyticalsolution.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -44,7 +45,6 @@ public class EmailService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-//    @Value("${app.base-url}")
     private String BASE_URL = "http://localhost:3000/";
 
 //    @Value("${app.sentTo}")

@@ -36,7 +36,6 @@ public class UtilityService {
     @Autowired
     private UserRepository userRepository;
 
-    @Value("${app.base-url}")
     private String BASE_URL = "http://localhost:3000/";
 
     // Directory to save uploaded images
