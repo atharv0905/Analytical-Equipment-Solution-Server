@@ -173,7 +173,7 @@ public class EmailService {
                             "<p style='font-size: 16px;'>Hello,</p>" +
                             "<p style='font-size: 15px;'>We received a request to reset your account password. To proceed, please click the button below:</p>" +
                             "<p style='text-align: center; margin: 20px 20px;'>" +
-                            "<a href='" + "http://" + CLIENT_IP + ":" + CLIENT_PORT+ "/user/view/reset-password.html?token=" + token + "' style='display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: white; font-size: 16px; text-decoration: none; border-radius: 5px;'>Reset Password</a>" +
+                            "<a href='" + "http://" + CLIENT_IP + ":" + CLIENT_PORT+ "/user/view/reset-password.html?token=" + token + "&email="+ email + "' style='display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: white; font-size: 16px; text-decoration: none; border-radius: 5px;'>Reset Password</a>" +
                             "</p>" +
                             "<p style='font-size: 14px; color: #555;'>If you did not request a password reset, please ignore this email or contact support if you have concerns.</p>" +
                             "<hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;'>" +

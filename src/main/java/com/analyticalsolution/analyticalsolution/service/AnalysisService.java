@@ -211,10 +211,13 @@ public class AnalysisService {
             // Query for pending orders
             String pendingSql = "SELECT COUNT(*) AS pending_order_count FROM sales WHERE order_status = 'PENDING'";
             Long pendingCount = jdbcTemplate.queryForObject(pendingSql, Long.class);
-            response.setPending(pendingCount);
+            String dispatchSql = "SELECT COUNT(*) AS pending_order_count FROM sales WHERE order_status = 'DISPATCHED'";
+            Long dispatchCount = jdbcTemplate.queryForObject(pendingSql, Long.class);
+            Long pending = pendingCount + dispatchCount;
+            response.setPending(pending);
 
             // Query for completed orders
-            String completedSql = "SELECT COUNT(*) AS completed_order_count FROM sales WHERE order_status = 'COMPLETED'";
+            String completedSql = "SELECT COUNT(*) AS completed_order_count FROM sales WHERE order_status = 'DELIVERED'";
             Long completedCount = jdbcTemplate.queryForObject(completedSql, Long.class);
 
             response.setCompleted(completedCount);
